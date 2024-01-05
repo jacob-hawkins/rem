@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace rem;
 public class Program {
+    public const string path = "./data/rem.md";
+
     static void Main(string[] args) {
         if (args.Length == 0) {
             Helper.Usage();
@@ -33,14 +36,32 @@ public static class Commands {
             Helper.Error("init");
         } else {
             // initiate file
+            string createText = "# REM" + Environment.NewLine + Environment.NewLine + 
+                "## Weekly Reminders" + Environment.NewLine + Environment.NewLine + 
+                "## Up Coming Reminders" + Environment.NewLine + Environment.NewLine + 
+                "## Daily Reminders" + Environment.NewLine + Environment.NewLine + 
+                "### 1. Sunday" + Environment.NewLine + Environment.NewLine + 
+                "### 2. Monday" + Environment.NewLine + Environment.NewLine + 
+                "### 3. Tuesday" + Environment.NewLine + Environment.NewLine + 
+                "### 4. Wednesday" + Environment.NewLine + Environment.NewLine + 
+                "### 5. Thursday" + Environment.NewLine + Environment.NewLine + 
+                "### 6. Friday" + Environment.NewLine + Environment.NewLine + 
+                "### 7. Saturday" + Environment.NewLine + Environment.NewLine;
+        
+            File.WriteAllText(Program.path, createText);
+            C.WriteGreen("\u2714 Successfully created your Rem file!");
         }
     }
 
 }
 
 public static class Helper {
-    public static bool IsInited() {
-        return true;
+    public static bool IsInited() {        
+        if (File.Exists(Program.path)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static void Usage() {
@@ -64,15 +85,15 @@ public static class Helper {
     public static void Error(string err) {
         switch (err) {
             case "init":
-                C.WriteRed("Already initiated reminder file.");
+                C.WriteRed("\u2718 Rem file already exsits!");
                 break;
 
             case "commandNotFound":
-                C.WriteRed("Command not found (See usage).");
+                C.WriteRed("\u2718 Command not found (See usage).");
                 break;
             
             default:
-                Console.WriteLine("Error");
+                Console.WriteLine("\u2718 Error");
                 break;
         }
     }
@@ -93,6 +114,12 @@ public static class C {
 
     public static void WriteRed(string s) {
         Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(s);
+        Console.ResetColor();    
+    }
+
+    public static void WriteGreen(string s) {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine(s);
         Console.ResetColor();    
     }
