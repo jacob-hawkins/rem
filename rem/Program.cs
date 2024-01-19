@@ -1,12 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Data;
+using Npgsql;
 
 
 namespace rem {
     public class Program {
         public const string path = "./data/rem.md";
+        public const string ConnectionString = "Server=localhost;Port=5432;User Id=postgres;Password=password;Database=rem;";
 
         static void Main(string[] args) {
             if (args.Length == 0) {
@@ -22,7 +26,10 @@ namespace rem {
                 case "init":
                     Commands.Init();
                     break;
-                
+                case "add":
+                    Commands.Add();
+                    break;
+
                 default:
                     Helper.Error("commandNotFound");
                     break;
@@ -50,7 +57,40 @@ namespace rem {
                     "### 7. Saturday" + Environment.NewLine + Environment.NewLine;
             
                 File.WriteAllText(Program.path, createText);
-                C.WriteGreen("\u2714 Successfully created your Rem file!");
+                C.Success("Successfully created your Rem file!");
+            }
+        }
+
+        public async static void Add() {
+            try {
+                var con = new NpgsqlConnection(
+                connectionString: Program.ConnectionString);
+                con.Open();
+                using var cmd = new NpgsqlCommand();
+                cmd.Connection = con;
+
+                DateTime dt = DateTime.Now;
+
+                // Insert some data
+                cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
+                cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = 1;
+                cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = "Reminder from program";
+                cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+                await cmd.ExecuteNonQueryAsync();
+
+                C.Success("Successfully added reminder to list.");
+
+                // Retrieve all rows
+                // cmd.CommandText = $"SELECT * FROM reminders";
+                // NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+                // while (await reader.ReadAsync()) {
+                //     Console.WriteLine(reader[0]);
+                //     Console.WriteLine(reader[1]);
+                //     Console.WriteLine(reader[2]);
+                //     Console.WriteLine(reader[3]);
+                // }
+            } catch (Exception e) {
+                C.Error(e.Message);
             }
         }
 
@@ -86,15 +126,15 @@ namespace rem {
         public static void Error(string err) {
             switch (err) {
                 case "init":
-                    C.WriteRed("\u2718 Rem file already exsits!");
+                    C.Error("Rem file already exsits!");
                     break;
 
                 case "commandNotFound":
-                    C.WriteRed("\u2718 Command not found (See usage).");
+                    C.Error("Command not found (See usage).");
                     break;
                 
                 default:
-                    Console.WriteLine("\u2718 Error");
+                    C.Error("Error");
                     break;
             }
         }
@@ -113,15 +153,15 @@ namespace rem {
             Console.ResetColor();    
         }
 
-        public static void WriteRed(string s) {
+        public static void Error(string s) {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(s);
+            Console.WriteLine("\u2718 " + s);
             Console.ResetColor();    
         }
 
-        public static void WriteGreen(string s) {
+        public static void Success(string s) {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(s);
+            Console.WriteLine("\u2714 " + s);
             Console.ResetColor();    
         }
     }

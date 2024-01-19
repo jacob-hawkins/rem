@@ -13,3 +13,8 @@
 /Users/jacobhawkins/Desktop/rem/rem/obj/Debug/net8.0/rem.pdb
 /Users/jacobhawkins/Desktop/rem/rem/obj/Debug/net8.0/rem.genruntimeconfig.cache
 /Users/jacobhawkins/Desktop/rem/rem/obj/Debug/net8.0/ref/rem.dll
+/Users/jacobhawkins/Desktop/rem/rem/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/Users/jacobhawkins/Desktop/rem/rem/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+/Users/jacobhawkins/Desktop/rem/rem/bin/Debug/net8.0/Npgsql.dll
+/Users/jacobhawkins/Desktop/rem/rem/obj/Debug/net8.0/rem.csproj.AssemblyReference.cache
+/Users/jacobhawkins/Desktop/rem/rem/obj/Debug/net8.0/rem.csproj.CopyComplete
