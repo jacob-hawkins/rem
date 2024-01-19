@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "K6jIsvvNN4rc6svMzHw/JRQ9B1mUMEWbISok6AOApkrfa51i6O7ZSzXoTvAwsV0lPyRJ/BSK8tACf4/nPJOIag==",
+  "dgSpecHash": "IB3xbCpcFXA9P81sbHp6sea2M0UTi+T3EMAFdvfuW9k6Dj3oC93zIWX+1kB/ngA1OKntEYEw5oqcNODtOjntZw==",
   "success": true,
   "projectFilePath": "/Users/jacobhawkins/Desktop/rem/rem/rem.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/jacobhawkins/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/Users/jacobhawkins/.nuget/packages/microsoft.extensions.logging.abstractions/8.0.0/microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "/Users/jacobhawkins/.nuget/packages/npgsql/8.0.1/npgsql.8.0.1.nupkg.sha512"
+  ],
   "logs": []
 }
