@@ -29,6 +29,7 @@ The database was created using Postgres and will hopefully be hosted on Vercel s
 | reminder_id | user_id | title | date | completed |
 | ----------- | ------- | ----- | ---- | --------- |
 | 1            | 1        | Example reminder      | 2024-01-01     | false          |
+
 `reminder_id`: A unique id for each reminder. This connects the reminders to the `work_on_dates` table.
 
 `user_id`: A unique id for each user. This connects the user to their reminders.
@@ -44,6 +45,7 @@ The database was created using Postgres and will hopefully be hosted on Vercel s
 | reminder_id | date1 | date2 | date3 |
 | ----------- | ----- | ----- | ----- |
 | 1           | 2024-01-01      | 2024-01-02      | 2024-01-03      |
+
 `reminder_id`: A unique id for each reminder. Connecting the reminder to the list of dates.
 
 `date`: List of dates connecting to the reminders for additional working on dates.
