@@ -5,11 +5,13 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Data;
 using Npgsql;
+using System.Net.NetworkInformation;
 
 
 namespace rem {
     public class Program {
         public const string path = "./data/rem.md";
+        public const string user_id = "1";
         public const string ConnectionString = "Server=localhost;Port=5432;User Id=postgres;Password=password;Database=rem;";
 
         static void Main(string[] args) {
@@ -28,6 +30,9 @@ namespace rem {
                     break;
                 case "add":
                     Commands.Add();
+                    break;
+                case "view":
+                    Commands.View();
                     break;
 
                 default:
@@ -79,16 +84,39 @@ namespace rem {
                 await cmd.ExecuteNonQueryAsync();
 
                 C.Success("Successfully added reminder to list.");
+            } catch (Exception e) {
+                C.Error(e.Message);
+            }
+        }
 
-                // Retrieve all rows
-                // cmd.CommandText = $"SELECT * FROM reminders";
-                // NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
-                // while (await reader.ReadAsync()) {
-                //     Console.WriteLine(reader[0]);
-                //     Console.WriteLine(reader[1]);
-                //     Console.WriteLine(reader[2]);
-                //     Console.WriteLine(reader[3]);
-                // }
+        public async static void View() {
+            const string format = "{0} {1,-32} {2} {3, 6}";
+            string completed = "[ ]";
+            int i = 1;
+
+            try {
+                var con = new NpgsqlConnection(
+                connectionString: Program.ConnectionString);
+                con.Open();
+                using var cmd = new NpgsqlCommand();
+                cmd.Connection = con;
+                
+                cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = {Program.user_id}";
+                NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+                
+                while (await reader.ReadAsync()) {
+                    if (reader[4].ToString() == "True") {
+                        completed = "[X]";
+                        
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine(format, i, reader[2], reader[3], completed);
+                        Console.ResetColor();
+                    } else {
+                        Console.WriteLine(format, i, reader[2], reader[3], completed);
+                    }
+                    
+                    i++;
+                }
             } catch (Exception e) {
                 C.Error(e.Message);
             }
