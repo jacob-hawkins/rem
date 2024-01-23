@@ -1,11 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Data;
-using Npgsql;
-using System.Net.NetworkInformation;
+﻿using Npgsql;
 
 
 namespace rem {
