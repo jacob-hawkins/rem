@@ -33,7 +33,6 @@ namespace commands {
 
         public static async void View() {
             const string format = "{0} {1,-32} {2} {3, 6}";
-            string completed = "[ ]";
             int i = 1;
 
             try {
@@ -47,6 +46,8 @@ namespace commands {
                 NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                 
                 while (await reader.ReadAsync()) {
+                    string completed = "[ ]";
+
                     if (reader[4].ToString() == "True") {
                         completed = "[X]";
                         
