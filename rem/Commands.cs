@@ -1,8 +1,6 @@
 using Npgsql;
 using rem;
 using helper;
-using System.Reflection;
-using Npgsql.Replication;
 
 namespace commands {
     public class Reminder {
@@ -70,7 +68,9 @@ namespace commands {
 
                     reminders.Add(r);
                 }
-                    
+                
+                reminders = SortReminders(reminders);
+
                 for (int i = 0; i < reminders.Count; i++) { 
                     string completed = "[ ]";
 
@@ -78,10 +78,10 @@ namespace commands {
                         completed = "[X]";
                         
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date, completed);
+                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
                         Console.ResetColor();
                     } else {
-                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date, completed);
+                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
                     }
                     
                     j++;
@@ -89,6 +89,13 @@ namespace commands {
             } catch (Exception e) {
                 C.Error(e.Message);
             }
+        }
+
+        private static List<Reminder> SortReminders(List<Reminder> reminders) {
+            reminders.Sort((x, y) => DateTime.Compare(x.date, y.date));
+            reminders = reminders.OrderBy(x => x.completed).ToList();
+            
+            return reminders;
         }
 
     }
