@@ -1,13 +1,24 @@
 using rem;
 using commands;
+using Npgsql;
 
 namespace helper {
-    public static class Helper {
-        public static bool IsInited() {        
-            if (File.Exists(Program.path)) {
-                return true;
-            } else {
-                return false;
+    public static class Helper {    
+        public static async void DeleteFromDB(int reminder_id) {
+            try {
+               var con = new NpgsqlConnection(
+                connectionString: Program.ConnectionString);
+                con.Open();
+                using var cmd = new NpgsqlCommand();
+                cmd.Connection = con;
+
+                cmd.CommandText = $"DELETE FROM reminders WHERE reminder_id = @reminder_id";
+                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                await cmd.ExecuteNonQueryAsync();
+
+                con.Close();
+            } catch (Exception e) {
+                C.Error(e.Message);
             }
         }
 
@@ -51,7 +62,11 @@ namespace helper {
                 case "commandNotFound":
                     C.Error("Command not found (See help).");
                     break;
-                
+
+                case "invalid date":
+                    C.Error("Invalid date.");
+                    break;
+
                 default:
                     C.Error("Error");
                     break;
