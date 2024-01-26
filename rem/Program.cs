@@ -1,5 +1,6 @@
 ﻿using commands;
 using helper;
+using view;
 
 namespace rem {
     public class Program {
@@ -25,7 +26,7 @@ namespace rem {
                     Commands.Add();
                     break;
                 case "view":
-                    Commands.View();
+                    View.SeeReminders();
                     break;
                 case "help":
                     Helper.Usage();
