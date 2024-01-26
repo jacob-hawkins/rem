@@ -1,6 +1,7 @@
 using rem;
 using helper;
 using Npgsql;
+using Npgsql.PostgresTypes;
 
 namespace commands {
     public class Reminder {
@@ -18,7 +19,16 @@ namespace commands {
 
     }
 
-    public class Commands {
+    public static class Commands {
+        private static List<Reminder> OverDue { get; set; } = [];
+        private static List<Reminder> Sunday { get; set; } = [];
+        private static List<Reminder> Monday { get; set; } = [];
+        private static List<Reminder> Tuesday { get; set; } = [];
+        private static List<Reminder> Wednesday { get; set; } = [];
+        private static List<Reminder> Thursday { get; set; } = [];
+        private static List<Reminder> Friday { get; set; } = [];
+        private static List<Reminder> Saturday { get; set; } = [];
+
         public static void Init() {
             
         }
@@ -49,8 +59,6 @@ namespace commands {
         }
 
         public static async void View() {
-            const string format = "{0} {1,-32} {2} {3, 6}";
-            int j = 1;
             List<Reminder> reminders = new List<Reminder>();
             DateTime dt = DateTime.Today;
 
@@ -77,38 +85,53 @@ namespace commands {
 
                 con.Close();
                 
+                } catch (Exception e) {
+                    C.Error(e.Message);
+                }
+                
                 reminders = SortReminders(reminders);
 
                 Console.WriteLine("\n");
                 C.WriteBlue(dt.ToString("d") + " - " + DateTime.Today.DayOfWeek);
                 C.WriteBlue("----------------------------------------------------------");
 
-                for (int i = 0; i < reminders.Count; i++) { 
-                    string completed = "[ ]";
-                    // Console.Write(DateTime.Compare(dt, reminders[i].date) + " ");
-
-                    if (reminders[i].completed == true) {
-                        completed = "[X]";
-                        
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
-                        Console.ResetColor();
-                    } else if (DateTime.Compare(dt, reminders[i].date) > 0) {
-                        // overdue
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
-                        Console.ResetColor();
-
-                    } else {
-                        Console.ResetColor();
-                        Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
-                    }
-                    
-                    j++;
+                if (OverDue.Count > 0) {
+                    C.WriteBlue("0 Past");
+                    PrintReminders(OverDue);
                 }
-            } catch (Exception e) {
-                C.Error(e.Message);
-            }
+
+                C.WriteBlue("1 Sunday");
+                if (Sunday.Count > 0) {
+                    PrintReminders(Sunday);
+                } else {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("No reminders today!\n");
+                    Console.ResetColor();
+                }
+
+                C.WriteBlue("2 Monday");
+                if (Monday.Count > 0) PrintReminders(Monday);
+                else NoRemindersToday();
+
+                C.WriteBlue("3 Tuesday");
+                if (Tuesday.Count > 0) PrintReminders(Tuesday);
+                else NoRemindersToday();
+
+                C.WriteBlue("4 Wednesday");
+                if (Wednesday.Count > 0) PrintReminders(Wednesday);
+                else NoRemindersToday();
+
+                C.WriteBlue("5 Thursday");
+                if (Thursday.Count > 0) PrintReminders(Thursday);
+                else NoRemindersToday();
+
+                C.WriteBlue("6 Friday");
+                if (Friday.Count > 0) PrintReminders(Friday);
+                else NoRemindersToday();
+
+                C.WriteBlue("7 Saturday");
+                if (Saturday.Count > 0) PrintReminders(Saturday);
+                else NoRemindersToday();
         }
 
         private static List<Reminder> SortReminders(List<Reminder> reminders) {
@@ -122,15 +145,87 @@ namespace commands {
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) > 0 && reminders[i].completed == true) {
                     Helper.DeleteFromDB(reminders[i].reminder_id);
                 }
-
-                Console.WriteLine("");
                 
-                if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) > 0 && reminders[i].completed != true) {
-                    Console.WriteLine(reminders[i].date);
+                // overdue
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) > 0) {
+                    OverDue.Add(reminders[i]);
+                }
+
+                // due sunday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+1), reminders[i].date) == 0) {
+                    Sunday.Add(reminders[i]);
+                }
+
+                // due monday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+2), reminders[i].date) == 0) {
+                    Monday.Add(reminders[i]);
+                }
+
+                // due tuesday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+3), reminders[i].date) == 0) {
+                    Tuesday.Add(reminders[i]);
+                }
+
+                // due wednesday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+4), reminders[i].date) == 0) {
+                    Wednesday.Add(reminders[i]);
+                }
+
+                // due thursday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+5), reminders[i].date) == 0) {
+                    Thursday.Add(reminders[i]);
+                }
+
+                // due friday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+6), reminders[i].date) == 0) {
+                    Friday.Add(reminders[i]);
+                }
+
+                // due saturday
+                if (DateTime.Compare(DateTime.Today.AddDays(beginning+7), reminders[i].date) == 0) {
+                    Saturday.Add(reminders[i]);
                 }
             }
             
             return reminders;
+        }
+
+        private static void PrintReminders(List<Reminder> reminders) {
+            int j = 1;
+            const string format = "{0} {1,-32} {2} {3, 6}";
+            DateTime dt = DateTime.Today;
+            
+            for (int i = 0; i < reminders.Count; i++) { 
+                string completed = "[ ]";
+                // Console.Write(DateTime.Compare(dt, reminders[i].date) + " ");
+
+                if (reminders[i].completed == true) {
+                    completed = "[X]";
+                    
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
+                    Console.ResetColor();
+                } else if (DateTime.Compare(dt, reminders[i].date) > 0) {
+                    // overdue
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
+                    Console.ResetColor();
+
+                } else {
+                    Console.ResetColor();
+                    Console.WriteLine(format, j, reminders[i].title, reminders[i].date.ToString("d"), completed);
+                }
+                
+                j++;
+            }
+
+            Console.Write("\n");
+        }
+
+        private static void NoRemindersToday() {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("Nothing going on today!\n");
+            Console.ResetColor();
         }
 
         private static int FindBeginningOfWeek() {

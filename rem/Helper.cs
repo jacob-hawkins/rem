@@ -81,6 +81,12 @@ namespace helper {
             Console.ResetColor();        
         }
 
+        public static void WriteGray(string s) {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(s);
+            Console.ResetColor();        
+        }
+
         public static void WriteYellow(string s) {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(s);
