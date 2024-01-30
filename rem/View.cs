@@ -36,7 +36,7 @@ namespace view {
                         (DateTime)reader[3],
                         (bool)reader[4]
                     );
-                    
+
                     reminders.Add(r);
                 }
 
@@ -58,31 +58,31 @@ namespace view {
                     PrintReminders(OverDue);
                 }
 
-                CheckColorOfDay("1 Sunday");
+                CheckColorOfDay($"1 Sunday {DateTime.Today.AddDays(beginning).Month}/{DateTime.Today.AddDays(beginning).Day}");
                 if (Sunday.Count > 0) PrintReminders(Sunday);
                 else NoRemindersToday(beginning);
 
-                CheckColorOfDay("2 Monday");
+                CheckColorOfDay($"2 Monday {DateTime.Today.AddDays(beginning+1).Month}/{DateTime.Today.AddDays(beginning+1).Day}");
                 if (Monday.Count > 0) PrintReminders(Monday);
                 else NoRemindersToday(beginning+1);
 
-                CheckColorOfDay("3 Tuesday");
+                CheckColorOfDay($"3 Tuesday {DateTime.Today.AddDays(beginning+2).Month}/{DateTime.Today.AddDays(beginning+2).Day}");
                 if (Tuesday.Count > 0) PrintReminders(Tuesday);
                 else NoRemindersToday(beginning+2);
 
-                CheckColorOfDay("4 Wednesday");
+                CheckColorOfDay($"4 Wednesday {DateTime.Today.AddDays(beginning+3).Month}/{DateTime.Today.AddDays(beginning+3).Day}");
                 if (Wednesday.Count > 0) PrintReminders(Wednesday);
                 else NoRemindersToday(beginning+3);
 
-                CheckColorOfDay("5 Thursday");
+                CheckColorOfDay($"5 Thursday {DateTime.Today.AddDays(beginning+4).Month}/{DateTime.Today.AddDays(beginning+4).Day}");
                 if (Thursday.Count > 0) PrintReminders(Thursday);
                 else NoRemindersToday(beginning+4);
 
-                CheckColorOfDay("6 Friday");
+                CheckColorOfDay($"6 Friday {DateTime.Today.AddDays(beginning+5).Month}/{DateTime.Today.AddDays(beginning+5).Day}");
                 if (Friday.Count > 0) PrintReminders(Friday);
                 else NoRemindersToday(beginning+5);
 
-                CheckColorOfDay("7 Saturday");
+                CheckColorOfDay($"7 Saturday {DateTime.Today.AddDays(beginning+6).Month}/{DateTime.Today.AddDays(beginning+6).Day}");
                 if (Saturday.Count > 0) PrintReminders(Saturday);
                 else NoRemindersToday(beginning+6);
 
@@ -211,7 +211,7 @@ namespace view {
         }
 
         private static void CheckColorOfDay(string s) {
-            if (s.Split(' ').Last() == DateTime.Today.DayOfWeek.ToString()) {
+            if (s.Split(' ')[1] == DateTime.Today.DayOfWeek.ToString()) {
                 C.WriteYellow(s);
             } else C.WriteBlue(s);
         }
