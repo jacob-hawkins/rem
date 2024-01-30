@@ -31,12 +31,12 @@ namespace view {
                 
                 while (await reader.ReadAsync()) {
                     var r = new Reminder(
-                        (int)reader[1],
+                        (int)reader[0],
                         (string)reader[2] ?? String.Empty,
                         (DateTime)reader[3],
                         (bool)reader[4]
                     );
-
+                    
                     reminders.Add(r);
                 }
 
@@ -46,12 +46,12 @@ namespace view {
                     C.Error(e.Message);
                 }
                 
-                reminders = SortReminders(reminders);
+                SortReminders(reminders);
                 int beginning = FindBeginningOfWeek();
 
                 Console.WriteLine("\n");
-                C.WriteBlue(dt.ToString("d") + " - " + DateTime.Today.DayOfWeek);
-                C.WriteBlue("----------------------------------------------------------");
+                C.WriteYellow($"{DateTime.Today.DayOfWeek} {dt.ToString("d")}");
+                C.WriteYellow("----------------------------------------------------------");
 
                 if (OverDue.Count > 0) {
                     C.WriteBlue("0 Past");
@@ -95,7 +95,7 @@ namespace view {
 
 
     
-        private static List<Reminder> SortReminders(List<Reminder> reminders) {
+        private static void SortReminders(List<Reminder> reminders) {            
             reminders.Sort((x, y) => DateTime.Compare(x.date, y.date));
             reminders = reminders.OrderBy(x => x.completed).ToList();
 
@@ -104,56 +104,65 @@ namespace view {
             for (int i = 0; i < reminders.Count; i++) {
                 // completed reminders from earlier than the beginning of this week
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) > 0 && reminders[i].completed == true) {
+                    Console.WriteLine(reminders[i].reminder_id);
                     Helper.DeleteFromDB(reminders[i].reminder_id);
+                    continue;
                 }
                 
                 // overdue
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) > 0) {
                     OverDue.Add(reminders[i]);
+                    continue;
                 }
 
                 // due sunday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) == 0) {
                     Sunday.Add(reminders[i]);
+                    continue;
                 }
 
                 // due monday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+1), reminders[i].date) == 0) {
                     Monday.Add(reminders[i]);
+                    continue;
                 }
 
                 // due tuesday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+2), reminders[i].date) == 0) {
                     Tuesday.Add(reminders[i]);
+                    continue;
                 }
 
                 // due wednesday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+3), reminders[i].date) == 0) {
                     Wednesday.Add(reminders[i]);
+                    continue;
                 }
 
                 // due thursday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+4), reminders[i].date) == 0) {
                     Thursday.Add(reminders[i]);
+                    continue;
                 }
 
                 // due friday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+5), reminders[i].date) == 0) {
                     Friday.Add(reminders[i]);
+                    continue;
                 }
 
                 // due saturday
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+6), reminders[i].date) == 0) {
                     Saturday.Add(reminders[i]);
+                    continue;
                 }
 
                 // future
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning+7), reminders[i].date) < 0) {
                     Future.Add(reminders[i]);
+                    continue;
                 }
             }
-            
-            return reminders;
         }
 
         private static void PrintReminders(List<Reminder> reminders) {

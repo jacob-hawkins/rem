@@ -6,7 +6,7 @@ namespace helper {
     public static class Helper {    
         public static async void DeleteFromDB(int reminder_id) {
             try {
-               var con = new NpgsqlConnection(
+                var con = new NpgsqlConnection(
                 connectionString: Program.ConnectionString);
                 con.Open();
                 using var cmd = new NpgsqlCommand();
@@ -17,6 +17,7 @@ namespace helper {
                 await cmd.ExecuteNonQueryAsync();
 
                 con.Close();
+                Console.WriteLine("Successfully deleted");
             } catch (Exception e) {
                 C.Error(e.Message);
             }
