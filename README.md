@@ -75,7 +75,7 @@ Your reminder list will be displayed. At the top, it displays the current day of
 
 #### Categories
 
-If there are any overdue reminders from previous week, there will be a _0 Past_ section displayed. If there are any reminders in the future from the current week, there will be a _8 Future_ section displayed. Each day of the week has a number next to the name (i.e. _1 Sunday_).
+If there are any overdue reminders from previous weeks, there will be a _0 Past_ section displayed. If there are any reminders in the future from the current week, there will be a _8 Future_ section displayed. Each day of the week has a number next to the name (i.e. _1 Sunday_).
 
 #### Reminder Fields
 
