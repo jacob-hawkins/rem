@@ -242,7 +242,7 @@ namespace view {
                     beginning = -6;
                     break;
                 default:
-                    Helper.Error("invalid date");
+                    C.Error("Invalid date.");
                     return -1;
             }
         

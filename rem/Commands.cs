@@ -1,7 +1,7 @@
 using rem;
 using helper;
-using view;
 using Npgsql;
+using add;
 
 namespace commands {
     public class Reminder {
@@ -25,6 +25,52 @@ namespace commands {
         }
 
         public static async void Add() {
+            DateTime dt = DateTime.MinValue;
+            string title = "";
+            
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write("Remeber: ");
+            Console.ResetColor();
+
+            string? reminder = Console.ReadLine();
+            if (reminder == "") return;
+
+
+            if (reminder!.Contains("on ")) {
+                var rem_split = reminder.Split("on ");
+                
+                title = rem_split[0];
+                dt = add.Add.FindDate(rem_split[1]);
+
+                if (dt == DateTime.MinValue) {
+                    C.Error("Invalid Date");
+                    return;
+                }
+            } else {
+                title = reminder;
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("When: ");
+                Console.ResetColor();
+
+                string? date = Console.ReadLine();
+                if (date == "") {
+                    C.Error("You must enter a date (Press enter again to cancel add).");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("When: ");
+                    Console.ResetColor();
+
+                    date = Console.ReadLine();
+                    if (date == "") return;
+                }
+
+                dt = add.Add.FindDate(date!);
+
+                if (dt == DateTime.MinValue) {
+                    C.Error("Invalid Date");
+                    return;
+                }
+            }
+            
             try {
                 var con = new NpgsqlConnection(
                 connectionString: Program.ConnectionString);
@@ -32,12 +78,10 @@ namespace commands {
                 using var cmd = new NpgsqlCommand();
                 cmd.Connection = con;
 
-                DateTime dt = DateTime.Now;
-
                 // Insert data
                 cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
                 cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = 1;
-                cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = "Reminder from program";
+                cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
                 cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
                 await cmd.ExecuteNonQueryAsync();
 

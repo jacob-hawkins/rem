@@ -53,26 +53,6 @@ namespace helper {
 
             Console.WriteLine("{0,50:N1}", "Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'");
         }
-
-        public static void Error(string err) {
-            switch (err) {
-                case "init":
-                    C.Error("Rem file already exsits!");
-                    break;
-
-                case "commandNotFound":
-                    C.Error("Command not found (See help).");
-                    break;
-
-                case "invalid date":
-                    C.Error("Invalid date.");
-                    break;
-
-                default:
-                    C.Error("Error");
-                    break;
-            }
-        }
     }
 
     public static class C {

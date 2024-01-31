@@ -33,7 +33,7 @@ namespace rem {
                     break;
 
                 default:
-                    Helper.Error("commandNotFound");
+                    C.Error("Command could not be found (use help to view commands).");
                     break;
             }
         }
