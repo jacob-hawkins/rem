@@ -33,10 +33,10 @@ namespace commands {
             Console.ResetColor();
 
             string? reminder = Console.ReadLine();
-            if (reminder == null) return;
+            if (reminder == "") return;
 
 
-            if (reminder.Contains("on ")) {
+            if (reminder!.Contains("on ")) {
                 var rem_split = reminder.Split("on ");
                 
                 title = rem_split[0];
