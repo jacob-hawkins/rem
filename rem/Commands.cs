@@ -24,8 +24,8 @@ namespace commands {
             
         }
 
-        public static void Add() {
-            DateTime dt;
+        public static async void Add() {
+            DateTime dt = DateTime.MinValue;
             string title = "";
             
             Console.ForegroundColor = ConsoleColor.Blue;
@@ -46,37 +46,46 @@ namespace commands {
                     C.Error("Invalid Date");
                     return;
                 }
-                Console.WriteLine(title);
-                Console.WriteLine(dt);
             } else {
+                title = reminder;
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write("When: ");
                 Console.ResetColor();
 
                 string? date = Console.ReadLine();
-                if (reminder == null) return;
+                if (date == "") {
+                    C.Error("You must enter a date (Press enter again to cancel add).");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("When: ");
+                    Console.ResetColor();
+
+                    date = Console.ReadLine();
+                    if (date == "") return;
+                } else {
+                    dt = add.Add.FindDate(date!);
+                }
             }
+            
+            try {
+                var con = new NpgsqlConnection(
+                connectionString: Program.ConnectionString);
+                con.Open();
+                using var cmd = new NpgsqlCommand();
+                cmd.Connection = con;
 
-            // try {
-            //     var con = new NpgsqlConnection(
-            //     connectionString: Program.ConnectionString);
-            //     con.Open();
-            //     using var cmd = new NpgsqlCommand();
-            //     cmd.Connection = con;
+                // Insert data
+                cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
+                cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = 1;
+                cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
+                cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+                await cmd.ExecuteNonQueryAsync();
 
-            //     // Insert data
-            //     cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
-            //     cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = 1;
-            //     cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = "Reminder from program";
-            //     cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
-            //     await cmd.ExecuteNonQueryAsync();
+                con.Close();
 
-            //     con.Close();
-
-            //     C.Success("Successfully added reminder to list.");
-            // } catch (Exception e) {
-            //     C.Error(e.Message);
-            // }
+                C.Success("Successfully added reminder to list.");
+            } catch (Exception e) {
+                C.Error(e.Message);
+            }
         }
     }
 }
