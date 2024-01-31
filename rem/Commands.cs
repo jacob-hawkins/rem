@@ -61,8 +61,13 @@ namespace commands {
 
                     date = Console.ReadLine();
                     if (date == "") return;
-                } else {
-                    dt = add.Add.FindDate(date!);
+                }
+
+                dt = add.Add.FindDate(date!);
+
+                if (dt == DateTime.MinValue) {
+                    C.Error("Invalid Date");
+                    return;
                 }
             }
             
