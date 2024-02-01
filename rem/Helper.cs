@@ -74,34 +74,34 @@ namespace helper {
             Console.ResetColor();
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("{0,-10}", "init");
+            Console.Write("{0,-15}", "init");
             Console.ResetColor();
 
-            Console.WriteLine("{0,50:N1}", "Initialize reminder system files. (This only needs to be run once)");
+            Console.WriteLine("Initialize reminder system files. (This only needs to be run once)");
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("{0,-10}", "add");
+            Console.Write("{0,-15}", "add");
             Console.ResetColor();
 
-            Console.WriteLine("{0,50:N1}", "Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'");
+            Console.WriteLine("Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'");
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("{0,-10}", "complete");
+            Console.Write("{0,-15}", "complete");
             Console.ResetColor();
 
-            Console.WriteLine("{0,50:N1}", "Mark or unmark reminder as completed.");
+            Console.WriteLine("Mark or unmark reminder as completed.");
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("{0,-10}", "view");
+            Console.Write("{0,-15}", "view");
             Console.ResetColor();
 
-            Console.WriteLine("{0,50:N1}", "Print your reminders.");
+            Console.WriteLine("Print your reminders.");
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("{0,-10}", "help");
+            Console.Write("{0,-15}", "help");
             Console.ResetColor();
 
-            Console.WriteLine("{0,50:N1}", "Displays all commands and descriptions available.");
+            Console.WriteLine("Displays all commands and descriptions available.");
         }
     }
 }
