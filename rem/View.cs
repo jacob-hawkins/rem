@@ -55,6 +55,16 @@ namespace view {
             
             // print future
             reminders = await GetList(dates[dates.Count-1], "future");
+            if (reminders.Count != 0) {
+                int j = 1;
+                C.WriteBlue("8 Future");
+                for (int i = 0; i < reminders.Count; i++) {
+                    CheckColor(reminders[i], j, dates[dates.Count-1]);
+                    j++;
+                }
+                
+                Console.Write("\n");
+            }
         }
 
         private static List<DateTime> GetDates() {
