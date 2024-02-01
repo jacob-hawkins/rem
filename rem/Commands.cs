@@ -92,5 +92,9 @@ namespace commands {
                 C.Error(e.Message);
             }
         }
+
+        public static void Complete() {
+            
+        }
     }
 }
