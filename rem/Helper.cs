@@ -1,6 +1,6 @@
 using rem;
-using commands;
 using Npgsql;
+using print;
 
 namespace helper {
     public static class Helper {    
@@ -17,10 +17,42 @@ namespace helper {
                 await cmd.ExecuteNonQueryAsync();
 
                 con.Close();
-                Console.WriteLine("Successfully deleted");
             } catch (Exception e) {
                 C.Error(e.Message);
             }
+        }
+
+         public static int FindBeginningOfWeek() {
+            int beginning;
+
+            switch (DateTime.Today.DayOfWeek.ToString()) {
+                case "Sunday":
+                    beginning = 0;
+                    break;
+                case "Monday":
+                    beginning = -1;
+                    break;
+                case "Tuesday":
+                    beginning = -2;
+                    break;
+                case "Wednesday":
+                    beginning = -3;
+                    break;
+                case "Thursday":
+                    beginning = -4;
+                    break;
+                case "Friday":
+                    beginning = -5;
+                    break;
+                case "Saturday":
+                    beginning = -6;
+                    break;
+                default:
+                    C.Error("Invalid date.");
+                    return -1;
+            }
+        
+            return beginning;
         }
 
         public static void Usage() {
@@ -54,37 +86,4 @@ namespace helper {
             Console.WriteLine("{0,50:N1}", "Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'");
         }
     }
-
-    public static class C {
-        public static void WriteBlue(string s) {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine(s);
-            Console.ResetColor();        
-        }
-
-        public static void WriteGray(string s) {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(s);
-            Console.ResetColor();        
-        }
-
-        public static void WriteYellow(string s) {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(s);
-            Console.ResetColor();    
-        }
-
-        public static void Error(string s) {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\u2718 " + s);
-            Console.ResetColor();    
-        }
-
-        public static void Success(string s) {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\u2714 " + s);
-            Console.ResetColor();    
-        }
-    }
-
 }
