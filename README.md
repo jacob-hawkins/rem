@@ -46,10 +46,10 @@ The database was created using Postgres and will hopefully be hosted on Vercel s
 
 | Command  | Description                                                                                  |
 | -------- | -------------------------------------------------------------------------------------------- |
-| init     | Initialize reminder system files. (This only needs to be run once)                           |
-| add      | Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'. |
-| complete | Mark or unmark reminder as completed.                                                        |
-| view     | Print your reminders.                                                                        |
+| [init](https://github.com/jacob-hawkins/rem/tree/main?tab=readme-ov-file#init)     | Initialize reminder system files. (This only needs to be run once)                           |
+| [add](https://github.com/jacob-hawkins/rem/tree/main?tab=readme-ov-file#add)      | Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'. |
+| [complete](https://github.com/jacob-hawkins/rem/tree/main?tab=readme-ov-file#complete) | Mark or unmark reminder as completed.                                                        |
+| [view](https://github.com/jacob-hawkins/rem/tree/main?tab=readme-ov-file#view)     | Print your reminders.                                                                        |
 | help     | Displays all commands and descriptions available.                                            |
 
 ## `init`
