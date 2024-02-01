@@ -73,11 +73,11 @@ The user will be prompted to enter reminder. If the user uses the keyword `on` f
 
 Your reminder list will be displayed. At the top, it displays the current day of the week and the date. Below the line, each day of the current week will be displayed.
 
-#### Categories
+### Categories
 
 If there are any overdue reminders from previous weeks, there will be a _0 Past_ section displayed. If there are any reminders in the future from the current week, there will be a _8 Future_ section displayed. Each day of the week has a number next to the name (i.e. _1 Sunday_).
 
-#### Reminder Fields
+### Reminder Fields
 
 Each reminder is categorized under the day that the reminder is due and displays four fields.
 
@@ -97,7 +97,7 @@ Each reminder is categorized under the day that the reminder is due and displays
 
 > Status of the reminder. If the reminder is incomplete this will display as [ ]. If the reminder has been completed, this will display as [x] and will be greyed out.
 
-#### Coloring
+### Coloring
 
 The heading (containing the current day and the week and date) as well as the current day in the week in the section below are colored yellow signifying it is the current day. The rest of the days in the week are colored blue as headings.
 
