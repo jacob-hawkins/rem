@@ -26,13 +26,14 @@ namespace view {
                 using var cmd = new NpgsqlCommand();
                 cmd.Connection = con;
                 
-                cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = {Program.user_id}";
+                cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id";
+                cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
                 NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
                 
                 while (await reader.ReadAsync()) {
                     var r = new Reminder(
                         (int)reader[0],
-                        (string)reader[2] ?? String.Empty,
+                        (string)reader[2] ?? string.Empty,
                         (DateTime)reader[3],
                         (bool)reader[4]
                     );
@@ -47,7 +48,7 @@ namespace view {
                 }
                 
                 SortReminders(reminders);
-                int beginning = FindBeginningOfWeek();
+                int beginning = Helper.FindBeginningOfWeek();
 
                 Console.WriteLine("\n");
                 C.WriteYellow($"{DateTime.Today.DayOfWeek} {dt.ToString("d")}");
@@ -99,7 +100,7 @@ namespace view {
             reminders.Sort((x, y) => DateTime.Compare(x.date, y.date));
             reminders = reminders.OrderBy(x => x.completed).ToList();
 
-            int beginning = FindBeginningOfWeek();
+            int beginning = Helper.FindBeginningOfWeek();
         
             for (int i = 0; i < reminders.Count; i++) {
                 // completed reminders from earlier than the beginning of this week
@@ -214,39 +215,6 @@ namespace view {
             if (s.Split(' ')[1] == DateTime.Today.DayOfWeek.ToString()) {
                 C.WriteYellow(s);
             } else C.WriteBlue(s);
-        }
-
-        private static int FindBeginningOfWeek() {
-            int beginning;
-
-            switch (DateTime.Today.DayOfWeek.ToString()) {
-                case "Sunday":
-                    beginning = 0;
-                    break;
-                case "Monday":
-                    beginning = -1;
-                    break;
-                case "Tuesday":
-                    beginning = -2;
-                    break;
-                case "Wednesday":
-                    beginning = -3;
-                    break;
-                case "Thursday":
-                    beginning = -4;
-                    break;
-                case "Friday":
-                    beginning = -5;
-                    break;
-                case "Saturday":
-                    beginning = -6;
-                    break;
-                default:
-                    C.Error("Invalid date.");
-                    return -1;
-            }
-        
-            return beginning;
         }
     }
 }

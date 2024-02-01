@@ -80,7 +80,7 @@ namespace commands {
 
                 // Insert data
                 cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
-                cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = 1;
+                cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
                 cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
                 cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
                 await cmd.ExecuteNonQueryAsync();
@@ -93,8 +93,76 @@ namespace commands {
             }
         }
 
-        public static void Complete() {
+        public static async void Complete(int arg1, int arg2) {
+            Console.WriteLine($"{arg1} {arg2}");
+            int beginning = Helper.FindBeginningOfWeek();
+
+            // get date from arg1
+            DateTime dt = DateTime.Today.AddDays(beginning + (arg1 - 1));
+            List<Reminder> reminders = [];
+
+            var con = new NpgsqlConnection(
+            connectionString: Program.ConnectionString);
+            con.Open();
             
+            using (var cmd = new NpgsqlCommand()) {
+                try {
+                    cmd.Connection = con;
+                
+                    if (arg1 == 0) {
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date <= @date";
+                    } else if (arg1 == 8) {
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date >= @date";
+                    } else {
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date = @date";
+                    }
+
+                    cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
+                    cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+                    NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    
+                    while (await reader.ReadAsync()) {
+                        var r = new Reminder(
+                            (int)reader[0],
+                            (string)reader[2] ?? string.Empty,
+                            (DateTime)reader[3],
+                            (bool)reader[4]
+                        );
+
+                        reminders.Add(r);
+                    }
+
+                    } catch (Exception e) {
+                        C.Error(e.Message);
+                    }
+            }
+
+            con.Close();
+
+            reminders.Sort((x, y) => DateTime.Compare(x.date, y.date));
+            reminders = reminders.OrderBy(x => x.completed).ToList();
+
+            Console.WriteLine($"{reminders[arg2-1].reminder_id} {reminders[arg2-1].title}");
+
+            
+            con = new NpgsqlConnection(
+            connectionString: Program.ConnectionString);
+            con.Open();
+            using (var cmd = new NpgsqlCommand()) {
+                try {
+                    cmd.Connection = con;
+                    
+                    cmd.CommandText = $"UPDATE reminders SET completed = NOT completed WHERE user_id = @user_id AND reminder_id = @reminder_id";
+                    cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
+                    cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminders[arg2-1].reminder_id;
+                    await cmd.ExecuteNonQueryAsync();
+
+                } catch (Exception e) {
+                    C.Error(e.Message);
+                }
+            }
+
+            con.Close();
         }
     }
 }
