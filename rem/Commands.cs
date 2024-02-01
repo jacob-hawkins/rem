@@ -1,7 +1,7 @@
 using rem;
 using helper;
 using Npgsql;
-using add;
+using System.Collections.Generic;
 
 namespace commands {
     public class Reminder {
@@ -93,12 +93,36 @@ namespace commands {
             }
         }
 
-        public static async void Complete(int arg1, int arg2) {
-            Console.WriteLine($"{arg1} {arg2}");
+        public static async void Complete(string arg1, int arg2) {
+            Dictionary<string, string> day_lookup = new Dictionary<string, string>(){
+                {"past", "0"},
+                {"sunday", "1"},
+                {"monday", "2"},
+                {"tuesday", "3"},
+                {"wednesday", "4"},
+                {"thrusday", "5"},
+                {"friday", "6"},
+                {"saturday", "7"},
+                {"future", "8"},
+            };
+
+    
+            if (arg1 == "today" || arg1 == "sunday" || arg1 == "monday"
+                || arg1 == "tuesday" || arg1 == "wednesday" || arg1 == "thursday"
+                || arg1 == "friday" || arg1 == "saturday") {
+                    arg1 = arg1.ToLower();
+                    
+                    if (arg1 == "today") {
+                        arg1 = day_lookup[DateTime.Today.DayOfWeek.ToString().ToLower()];
+                    } else {
+                        arg1 = day_lookup[arg1];
+                    }
+                }
+
             int beginning = Helper.FindBeginningOfWeek();
 
             // get date from arg1
-            DateTime dt = DateTime.Today.AddDays(beginning + (arg1 - 1));
+            DateTime dt = DateTime.Today.AddDays(beginning + (int.Parse(arg1) - 1));
             List<Reminder> reminders = [];
 
             var con = new NpgsqlConnection(
@@ -109,9 +133,9 @@ namespace commands {
                 try {
                     cmd.Connection = con;
                 
-                    if (arg1 == 0) {
+                    if (arg1 == "0") {
                         cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date <= @date";
-                    } else if (arg1 == 8) {
+                    } else if (arg1 == "8") {
                         cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date >= @date";
                     } else {
                         cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date = @date";

@@ -30,7 +30,7 @@ namespace rem {
                         C.Error("Usage: rem complete [category #] [reminder #]");
                         break;
                     } else {
-                        Commands.Complete(int.Parse(args[1]), int.Parse(args[2]));
+                        Commands.Complete(args[1], int.Parse(args[2]));
                     }
                     break;
                 case "view":
