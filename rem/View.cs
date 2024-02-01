@@ -3,7 +3,6 @@ using commands;
 using helper;
 using print;
 using Npgsql;
-using System.Globalization;
 
 namespace view {
     public class View {
