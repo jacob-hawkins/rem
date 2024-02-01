@@ -84,6 +84,24 @@ namespace helper {
             Console.ResetColor();
 
             Console.WriteLine("{0,50:N1}", "Add a reminder to list. You will be prompted for a title, date, and optional 'work on days'");
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write("{0,-10}", "complete");
+            Console.ResetColor();
+
+            Console.WriteLine("{0,50:N1}", "Mark or unmark reminder as completed.");
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write("{0,-10}", "view");
+            Console.ResetColor();
+
+            Console.WriteLine("{0,50:N1}", "Print your reminders.");
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write("{0,-10}", "help");
+            Console.ResetColor();
+
+            Console.WriteLine("{0,50:N1}", "Displays all commands and descriptions available.");
         }
     }
 }
