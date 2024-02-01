@@ -17,7 +17,6 @@ namespace helper {
                 await cmd.ExecuteNonQueryAsync();
 
                 con.Close();
-                Console.WriteLine("Successfully deleted");
             } catch (Exception e) {
                 C.Error(e.Message);
             }

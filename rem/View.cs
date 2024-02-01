@@ -106,7 +106,6 @@ namespace view {
             for (int i = 0; i < reminders.Count; i++) {
                 // completed reminders from earlier than the beginning of this week
                 if (DateTime.Compare(DateTime.Today.AddDays(beginning), reminders[i].date) > 0 && reminders[i].completed == true) {
-                    Console.WriteLine(reminders[i].reminder_id);
                     Helper.DeleteFromDB(reminders[i].reminder_id);
                     continue;
                 }

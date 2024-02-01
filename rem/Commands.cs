@@ -24,7 +24,7 @@ namespace commands {
             
         }
 
-        public static async void Add() {
+        public static async Task Add() {
             DateTime dt = DateTime.MinValue;
             string title = "";
             
@@ -93,7 +93,7 @@ namespace commands {
             }
         }
 
-        public static async void Complete(string arg1, int arg2) {
+        public static async Task Complete(string arg1, int arg2) {
             Dictionary<string, string> day_lookup = new Dictionary<string, string>(){
                 {"past", "0"},
                 {"sunday", "1"},
@@ -108,7 +108,7 @@ namespace commands {
 
             arg1 = arg1.ToLower();
     
-            if (arg1 == "today" || arg1 == "sunday" || arg1 == "monday"
+            if (arg1 == "today" || arg1 == "past" || arg1 == "future" || arg1 == "sunday" || arg1 == "monday"
                 || arg1 == "tuesday" || arg1 == "wednesday" || arg1 == "thursday"
                 || arg1 == "friday" || arg1 == "saturday") {
                     if (arg1 == "today") {
