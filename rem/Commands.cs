@@ -1,7 +1,7 @@
 using rem;
 using helper;
+using print;
 using Npgsql;
-using System.Collections.Generic;
 
 namespace commands {
     public class Reminder {
@@ -106,12 +106,11 @@ namespace commands {
                 {"future", "8"},
             };
 
+            arg1 = arg1.ToLower();
     
             if (arg1 == "today" || arg1 == "sunday" || arg1 == "monday"
                 || arg1 == "tuesday" || arg1 == "wednesday" || arg1 == "thursday"
                 || arg1 == "friday" || arg1 == "saturday") {
-                    arg1 = arg1.ToLower();
-                    
                     if (arg1 == "today") {
                         arg1 = day_lookup[DateTime.Today.DayOfWeek.ToString().ToLower()];
                     } else {
@@ -166,9 +165,6 @@ namespace commands {
             reminders.Sort((x, y) => DateTime.Compare(x.date, y.date));
             reminders = reminders.OrderBy(x => x.completed).ToList();
 
-            Console.WriteLine($"{reminders[arg2-1].reminder_id} {reminders[arg2-1].title}");
-
-            
             con = new NpgsqlConnection(
             connectionString: Program.ConnectionString);
             con.Open();
@@ -186,6 +182,8 @@ namespace commands {
                 }
             }
 
+            string title = reminders[arg2-1].title.Trim();
+            C.Success($"Reminder: \"{title}\" was marked complete!");
             con.Close();
         }
     }
