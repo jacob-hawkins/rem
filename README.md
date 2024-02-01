@@ -104,4 +104,4 @@ rem complete `[category name/number]` [reminder number]
 
 rem complete [category name/number] `[reminder number]`
 
-> The reminder number is a unique number found on the left side of the title while using the `view` command (see [view](https://github.com/jacob-hawkins/rem/blob/main/README.md#view). This number specifies which reminder within the category chosen will be marked complete or incomplete.
+> The reminder number is a unique number found on the left side of the title while using the `view` command (see [view](https://github.com/jacob-hawkins/rem/blob/main/README.md#view)). This number specifies which reminder within the category chosen will be marked complete or incomplete.
