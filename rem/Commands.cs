@@ -107,7 +107,7 @@ namespace commands {
                 {"monday", "2"},
                 {"tuesday", "3"},
                 {"wednesday", "4"},
-                {"thrusday", "5"},
+                {"thursday", "5"},
                 {"friday", "6"},
                 {"saturday", "7"},
                 {"future", "8"},
@@ -125,10 +125,13 @@ namespace commands {
                     }
                 }
 
-            int beginning = Helper.FindBeginningOfWeek();
+            DateTime beginning = DateTime.Today.AddDays(-1*(int)DateTime.Today.DayOfWeek);
 
             // get date from arg1
-            DateTime dt = DateTime.Today.AddDays(beginning + (int.Parse(arg1) - 1));
+            DateTime dt;
+            if (arg1 == "0") dt = beginning;
+            else dt = beginning.AddDays(int.Parse(arg1) - 1);
+            
             List<Reminder> reminders = [];
 
             var con = new NpgsqlConnection(
@@ -162,9 +165,9 @@ namespace commands {
                         reminders.Add(r);
                     }
 
-                    } catch (Exception e) {
-                        C.Error(e.Message);
-                    }
+                } catch (Exception e) {
+                    C.Error(e.Message);
+                }
             }
 
             con.Close();

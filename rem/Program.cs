@@ -35,7 +35,7 @@ namespace rem {
                     }
                     break;
                 case "view":
-                    View.SeeReminders();
+                    await View.SeeReminders();
                     break;
                 case "help":
                     Helper.Usage();
