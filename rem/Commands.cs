@@ -87,7 +87,14 @@ namespace commands {
 
                 con.Close();
 
-                C.Success("Successfully added reminder to list.");
+                string day = "";
+                if (DateTime.Compare(DateTime.Today, dt) == 0) {
+                    day = "today";
+                } else {
+                    day = dt.DayOfWeek.ToString();
+                }
+                
+                C.Success($"Successfully added \"{title.Trim()}\" to {day}'s list.");
             } catch (Exception e) {
                 C.Error(e.Message);
             }
@@ -183,7 +190,7 @@ namespace commands {
             }
 
             string title = reminders[arg2-1].title.Trim();
-            C.Success($"Reminder: \"{title}\" was marked complete!");
+            C.Success($"Reminder \"{title}\" was marked complete!");
             con.Close();
         }
     }
