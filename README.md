@@ -74,7 +74,7 @@ Each reminder is categorized under the day that the reminder is due and displays
 
 **1** Example Reminder &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; 1/1/2024 &ensp; [ ]
 
-> This number signifies a unique identifier for each day. This is used when marking reminders complete (see `complete`).
+> This number signifies a unique identifier for each day. This is used when marking reminders complete (see [complete](https://github.com/jacob-hawkins/rem/blob/main/README.md#complete)).
 
 1 **Example Reminder** &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; 1/1/2024 &ensp; [ ]
 
@@ -104,4 +104,4 @@ rem complete `[category name/number]` [reminder number]
 
 rem complete [category name/number] `[reminder number]`
 
-> The reminder number is a unique number found on the left side of the title while using the `view` command (see view). This number specifies which reminder within the category chosen will be marked complete or incomplete.
+> The reminder number is a unique number found on the left side of the title while using the `view` command (see [view](https://github.com/jacob-hawkins/rem/blob/main/README.md#view). This number specifies which reminder within the category chosen will be marked complete or incomplete.
