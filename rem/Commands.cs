@@ -1,5 +1,4 @@
 using rem;
-using helper;
 using print;
 using Npgsql;
 
@@ -24,17 +23,44 @@ namespace commands {
             
         }
 
-        public static async Task Add() {
-            DateTime dt = DateTime.MinValue;
-            string title = "";
+        public static async Task Add(String[] args) {
+            DateTime dt;
+            string title;
+            string? reminder = "";
+            bool flag = false;
+            List<DateTime> work_on_dates = [];
+            string? dates = "empty";
+            int reminder_id;
             
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write("Remeber: ");
-            Console.ResetColor();
+            if (args.Length == 1) {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("Remeber: ");
+                Console.ResetColor();
+                
+                reminder = Console.ReadLine();
+                if (reminder == "") return;
+            } else if (args.Length == 2) {
+                if (args[1] == "-w") {
+                    flag = true;
 
-            string? reminder = Console.ReadLine();
-            if (reminder == "") return;
-
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("Remeber: ");
+                    Console.ResetColor();
+                
+                    reminder = Console.ReadLine();
+                    if (reminder == "") return;
+                } else reminder = args[1];
+            } else if (args.Length == 3) {
+                reminder = args[2];
+                if (args[1] == "-w") flag = true;
+                else {
+                    C.Error("Unknown flag.");
+                    return;
+                }
+            } else {
+                C.Error("Usage: rem add [flag] [\"reminder\"]");
+                return;
+            }
 
             if (reminder!.Contains("on ")) {
                 var rem_split = reminder.Split("on ");
@@ -70,34 +96,123 @@ namespace commands {
                     return;
                 }
             }
+
+            if (flag == true) {
+                dates = add.Add.PrintWorkOnDates();
+                if (dates == "") return;
+            }
+
+            var dates_split = dates?.Split(",");
+            if (dates_split?.Length > 3) {
+                C.Error("Too many days entered (only 3 days may be used). Please try again.");
+                
+                dates = add.Add.PrintWorkOnDates();
+                if (dates == "") return;
+            }
+
+            for (int i = 0; i < dates_split?.Length; i++) {
+                work_on_dates.Add(add.Add.FindDate(dates_split[i].Trim()));
+            }
             
             try {
-                var con = new NpgsqlConnection(
-                connectionString: Program.ConnectionString);
-                con.Open();
-                using var cmd = new NpgsqlCommand();
-                cmd.Connection = con;
+                using (var con = new NpgsqlConnection(connectionString: Program.ConnectionString)) {
+                    con.Open();
 
-                // Insert data
-                cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
-                cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
-                cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
-                cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
-                await cmd.ExecuteNonQueryAsync();
+                    // add to reminders table
+                    using (var cmd = new NpgsqlCommand()) {
+                        cmd.Connection = con;
 
-                con.Close();
+                        // Insert data
+                        cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date) RETURNING reminder_id";
+                        cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
+                        cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
+                        cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+                        var result = await cmd.ExecuteScalarAsync();
+                        reminder_id = int.Parse(result?.ToString()!);
+                    }                    
 
-                string day = "";
-                if (DateTime.Compare(DateTime.Today, dt) == 0) {
-                    day = "today";
-                } else {
-                    day = dt.DayOfWeek.ToString();
+                    if (flag == true) {
+                        
+
+                        // add to work on days table
+                        using (var cmd = new NpgsqlCommand()) {
+                            cmd.Connection = con;
+
+                            // Insert data
+                            if (work_on_dates.Count == 1) {
+                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1) VALUES (@reminder_id, @date1)";
+                                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                                cmd.Parameters.Add("@date1", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[0];
+
+                            } else if (work_on_dates.Count == 2) {
+                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1, date2) VALUES (@reminder_id, @date1, @date2)";
+                                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                                cmd.Parameters.Add("@date1", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[0];
+                                cmd.Parameters.Add("@date2", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[1];
+
+                            } else if (work_on_dates.Count == 3) {
+                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1, date2, date3) VALUES (@reminder_id, @date1, @date2, @date3)";
+                                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                                cmd.Parameters.Add("@date1", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[0];
+                                cmd.Parameters.Add("@date2", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[1];
+                                cmd.Parameters.Add("@date3", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[2];
+
+                            } else C.Error("Error");
+
+                            await cmd.ExecuteNonQueryAsync();
+                            
+                        }
+                    }
                 }
-                
-                C.Success($"Successfully added \"{title.Trim()}\" to {day}'s list.");
+
+                // check if adding to past list
+                if (DateTime.Compare(DateTime.Today.AddDays(-1*(int)DateTime.Today.DayOfWeek), dt) > 0) C.Success($"Successfully added \"{title.Trim()}\".");
+                else {
+                    string day = "";
+                    if (DateTime.Compare(DateTime.Today, dt) == 0) {
+                        day = "today";
+                    } else {
+                        day = dt.DayOfWeek.ToString();
+                    }
+
+                    C.Success($"Successfully added \"{title.Trim()}\" to {day}'s list.");
+                }
             } catch (Exception e) {
                 C.Error(e.Message);
             }
+                
+                
+                
+                
+                
+                
+                
+            //     var con = new NpgsqlConnection(
+            //     connectionString: Program.ConnectionString);
+            //     con.Open();
+            //     using var cmd = new NpgsqlCommand();
+            //     cmd.Connection = con;
+
+            //     // Insert data
+            //     cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
+            //     cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
+            //     cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
+            //     cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+            //     await cmd.ExecuteNonQueryAsync();
+
+            //     con.Close();
+
+            //     string day = "";
+            //     if (DateTime.Compare(DateTime.Today, dt) == 0) {
+            //         day = "today";
+            //     } else {
+            //         day = dt.DayOfWeek.ToString();
+            //     }
+                
+            //     C.Success($"Successfully added \"{title.Trim()}\" to {day}'s list.");
+            // } catch (Exception e) {
+            //     C.Error(e.Message);
+            // }
         }
 
         public static async Task Complete(string arg1, int arg2) {

@@ -1,7 +1,6 @@
-using System.Security.Cryptography.X509Certificates;
-using System.Xml;
 using commands;
 using helper;
+using print;
 
 namespace add {
     public class Add {
@@ -30,6 +29,24 @@ namespace add {
             }
             
             return DateTime.MinValue;
+        }
+
+        public static string PrintWorkOnDates() {
+            string? dates;
+            C.WriteBlue("When would you like to work on it? (Use commas to seperate dates)");
+            dates = Console.ReadLine();
+
+            if (dates == "") {
+                C.Error("You must enter at least one work on date (Press enter again to cancel add).");
+                Console.ForegroundColor = ConsoleColor.Blue;
+                C.WriteBlue("When would you like to work on it? (Use commas to seperate dates)");
+                Console.ResetColor();
+
+                dates = Console.ReadLine();
+                if (dates == "") return "";
+            }
+
+            return dates!;
         }
     }
 }

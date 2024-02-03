@@ -24,7 +24,7 @@ namespace rem {
                     Commands.Init();
                     break;
                 case "add":
-                    await Commands.Add();
+                    await Commands.Add(args);
                     break;
                 case "complete":
                     if (args.Length < 3) {

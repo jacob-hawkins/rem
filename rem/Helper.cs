@@ -22,39 +22,6 @@ namespace helper {
             }
         }
 
-        //  public static int FindBeginningOfWeek() {
-        //     int beginning;
-
-        //     switch (DateTime.Today.DayOfWeek.ToString()) {
-        //         case "Sunday":
-        //             beginning = 0;
-        //             break;
-        //         case "Monday":
-        //             beginning = -1;
-        //             break;
-        //         case "Tuesday":
-        //             beginning = -2;
-        //             break;
-        //         case "Wednesday":
-        //             beginning = -3;
-        //             break;
-        //         case "Thursday":
-        //             beginning = -4;
-        //             break;
-        //         case "Friday":
-        //             beginning = -5;
-        //             break;
-        //         case "Saturday":
-        //             beginning = -6;
-        //             break;
-        //         default:
-        //             C.Error("Invalid date.");
-        //             return -1;
-        //     }
-        
-        //     return beginning;
-        // }
-
         public static void Usage() {
             string logo = @"
  /$$$$$$$  /$$$$$$$$ /$$      /$$
