@@ -4,18 +4,29 @@ using Npgsql;
 
 namespace commands {
     public class Reminder {
-        public int reminder_id { get; set; }
-        public string title { get; set; } = string.Empty;
-        public DateTime date { get; set; }
-        public bool completed { get; set; }
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public bool Completed { get; set; }
+        public int Work_on { get; set; }
 
-        public Reminder (int reminder_id, string title, DateTime date, bool completed) {
-            this.reminder_id = reminder_id;
-            this.title = title;
-            this.date = date;
-            this.completed = completed;
+        public Reminder (int id, string title, DateTime date, bool completed, int work_on) {
+            Id = id;
+            Title = title;
+            Date = date;
+            Completed = completed;
+            Work_on = work_on;
         }
 
+        // Sort by date
+        public static int CompareDates(Reminder x, Reminder y) {
+            return DateTime.Compare(x.Date, y.Date);
+        }
+
+        // Sort false then true
+        public static int CompareCompleted(Reminder x, Reminder y) {
+            return x.Completed.CompareTo(y.Completed);
+        }
     }
 
     public static class Commands {
@@ -30,7 +41,7 @@ namespace commands {
             bool flag = false;
             List<DateTime> work_on_dates = [];
             string? dates = "empty";
-            int reminder_id;
+            int? work_on_id;
             
             if (args.Length == 1) {
                 Console.ForegroundColor = ConsoleColor.Blue;
@@ -118,51 +129,47 @@ namespace commands {
                 using (var con = new NpgsqlConnection(connectionString: Program.ConnectionString)) {
                     con.Open();
 
-                    // add to reminders table
-                    using (var cmd = new NpgsqlCommand()) {
-                        cmd.Connection = con;
-
-                        // Insert data
-                        cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date) RETURNING reminder_id";
-                        cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
-                        cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
-                        cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
-                        var result = await cmd.ExecuteScalarAsync();
-                        reminder_id = int.Parse(result?.ToString()!);
-                    }                    
-
                     if (flag == true) {
-                        
-
                         // add to work on days table
                         using (var cmd = new NpgsqlCommand()) {
                             cmd.Connection = con;
 
                             // Insert data
                             if (work_on_dates.Count == 1) {
-                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1) VALUES (@reminder_id, @date1)";
-                                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1) VALUES (@reminder_id, @date1) RETURNING work_on_id";
                                 cmd.Parameters.Add("@date1", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[0];
 
                             } else if (work_on_dates.Count == 2) {
-                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1, date2) VALUES (@reminder_id, @date1, @date2)";
-                                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1, date2) VALUES (@reminder_id, @date1, @date2) RETURNING work_on_id";
                                 cmd.Parameters.Add("@date1", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[0];
                                 cmd.Parameters.Add("@date2", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[1];
 
                             } else if (work_on_dates.Count == 3) {
-                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1, date2, date3) VALUES (@reminder_id, @date1, @date2, @date3)";
-                                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                                cmd.CommandText = $"INSERT INTO work_on_dates (reminder_id, date1, date2, date3) VALUES (@reminder_id, @date1, @date2, @date3) RETURNING work_on_id";
                                 cmd.Parameters.Add("@date1", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[0];
                                 cmd.Parameters.Add("@date2", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[1];
                                 cmd.Parameters.Add("@date3", NpgsqlTypes.NpgsqlDbType.Date).Value = work_on_dates[2];
 
                             } else C.Error("Error");
 
-                            await cmd.ExecuteNonQueryAsync();
+                            var result = await cmd.ExecuteScalarAsync();
+                            work_on_id = int.Parse(result?.ToString()!);
                             
                         }
                     }
+
+                    // add to reminders table
+                    using (var cmd = new NpgsqlCommand()) {
+                        cmd.Connection = con;
+
+                        // Insert data
+                        cmd.CommandText = $"INSERT INTO reminders (user_id, title, date, work_on_id) VALUES (@user_id, @title, @date, @work_on_id)";
+                        cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
+                        cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title.Trim();
+                        cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+                        cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
+                        await cmd.ExecuteNonQueryAsync();
+                    }                    
                 }
 
                 // check if adding to past list
@@ -274,7 +281,8 @@ namespace commands {
                             (int)reader[0],
                             (string)reader[2] ?? string.Empty,
                             (DateTime)reader[3],
-                            (bool)reader[4]
+                            (bool)reader[4],
+                            (int)reader[5]
                         );
 
                         reminders.Add(r);
@@ -287,8 +295,10 @@ namespace commands {
 
             con.Close();
 
-            reminders.Sort((x, y) => DateTime.Compare(x.date, y.date));
-            reminders = reminders.OrderBy(x => x.completed).ToList();
+            // reminders.Sort((x, y) => DateTime.Compare(x.Date, y.Date));
+            // reminders = reminders.OrderBy(x => x.Completed).ToList();
+            reminders.Sort(Reminder.CompareDates);
+            reminders = reminders.OrderBy(x => x.Completed).ToList();
 
             con = new NpgsqlConnection(
             connectionString: Program.ConnectionString);
@@ -299,7 +309,7 @@ namespace commands {
                     
                     cmd.CommandText = $"UPDATE reminders SET completed = NOT completed WHERE user_id = @user_id AND reminder_id = @reminder_id";
                     cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
-                    cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminders[arg2-1].reminder_id;
+                    cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminders[arg2-1].Id;
                     await cmd.ExecuteNonQueryAsync();
 
                 } catch (Exception e) {
@@ -307,7 +317,7 @@ namespace commands {
                 }
             }
 
-            string title = reminders[arg2-1].title.Trim();
+            string title = reminders[arg2-1].Title.Trim();
             C.Success($"Reminder \"{title}\" was marked complete!");
             con.Close();
         }

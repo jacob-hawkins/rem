@@ -24,7 +24,7 @@ namespace view {
             dates = GetDates();
 
             Console.WriteLine("\n");
-            C.WriteYellow($"{DateTime.Today.DayOfWeek} {DateTime.Today}");
+            C.WriteYellow($"{DateTime.Today.DayOfWeek} {DateTime.Now}");
             C.WriteYellow("----------------------------------------------------------");
             
             // print past
@@ -89,9 +89,9 @@ namespace view {
                 using (var cmd = new NpgsqlCommand()) {
                     cmd.Connection = con;
                     if (s == "past") 
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date <= @date AND completed = false";
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date < @date AND completed = false";
                     else if (s == "future")
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date >= @date AND completed = false";
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date > @date AND completed = false";
                     else
                         cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date = @date AND completed = false";
                     
@@ -101,10 +101,11 @@ namespace view {
                     using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync()) {
                         while (await reader.ReadAsync()) {
                             var r = new Reminder(
-                                (int)reader[0],
-                                (string)reader[2] ?? string.Empty,
-                                (DateTime)reader[3],
-                                (bool)reader[4]
+                                reader.GetInt32(reader.GetOrdinal("id")),
+                                reader.GetString(reader.GetOrdinal("title")),
+                                reader.GetDateTime(reader.GetOrdinal("date")),
+                                reader.GetBoolean(reader.GetOrdinal("completed")),
+                                reader.GetInt32(reader.GetOrdinal("work_on"))
                             );
 
                             reminders.Add(r);
@@ -131,10 +132,11 @@ namespace view {
                             }
                             
                             var r = new Reminder(
-                                (int)reader[0],
-                                (string)reader[2] ?? string.Empty,
-                                (DateTime)reader[3],
-                                (bool)reader[4]
+                                reader.GetInt32(reader.GetOrdinal("id")),
+                                reader.GetString(reader.GetOrdinal("title")),
+                                reader.GetDateTime(reader.GetOrdinal("date")),
+                                reader.GetBoolean(reader.GetOrdinal("completed")),
+                                reader.GetInt32(reader.GetOrdinal("work_on"))
                             );
 
                             reminders.Add(r);
@@ -150,21 +152,21 @@ namespace view {
             string completed = "[ ]";
             const string format = "{0} {1,-32} {2} {3, 6}";
 
-                    if (r.completed == true) {
+                    if (r.Completed == true) {
                         completed = "[X]";
                         
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.WriteLine(format, j, r.title, r.date.ToString("d"), completed);
+                        Console.WriteLine(format, j, r.Title, r.Date.ToString("d"), completed);
                         Console.ResetColor();
                     } else if (DateTime.Compare(DateTime.Today, dt) > 0) {
                         // overdue
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(format, j, r.title, r.date.ToString("d"), completed);
+                        Console.WriteLine(format, j, r.Title, r.Date.ToString("d"), completed);
                         Console.ResetColor();
 
                     } else {
                         Console.ResetColor();
-                        Console.WriteLine(format, j, r.title, r.date.ToString("d"), completed);
+                        Console.WriteLine(format, j, r.Title, r.Date.ToString("d"), completed);
                     }
         }
 
@@ -182,7 +184,7 @@ namespace view {
                 int j = 1;
                 
                 for (int i = 0; i < reminders.Count; i++) { 
-                    CheckColor(reminders[i], j, reminders[i].date);
+                    CheckColor(reminders[i], j, reminders[i].Date);
                     j++;
                 }
                 
