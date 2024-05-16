@@ -21,6 +21,7 @@ CREATE TABLE work_on (
 	completed BOOL DEFAULT False
 );
 
+INSERT INTO reminders (user_id, title, date) VALUES (1, 'test past', '5/14/24');
 INSERT INTO reminders (user_id, title, date) VALUES (1, 'test', '5/16/24');
 
 INSERT INTO work_on (reminder_id, title, date) VALUES (1, 'WORK ON TEST', '5/17/24');

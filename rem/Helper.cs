@@ -12,7 +12,7 @@ namespace helper {
                 using var cmd = new NpgsqlCommand();
                 cmd.Connection = con;
 
-                cmd.CommandText = $"DELETE FROM reminders WHERE reminder_id = @reminder_id";
+                cmd.CommandText = $"DELETE FROM reminders WHERE id = @reminder_id";
                 cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
                 await cmd.ExecuteNonQueryAsync();
 

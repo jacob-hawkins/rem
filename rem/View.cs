@@ -9,48 +9,36 @@ namespace view {
         public static async Task SeeReminders() {
             List<Reminder> reminders;
             List<DateTime> dates;
-            List<string> categories = new List<string>(){
-                "1 Sunday",
-                "2 Monday",
-                "3 Tuesday",
-                "4 Wednesday",
-                "5 Thursday",
-                "6 Friday",
-                "7 Saturday"
-            };
-            DateTime beginning = DateTime.Today.AddDays(-1*(int)DateTime.Today.DayOfWeek);
-            
+            DateTime today = DateTime.Today;
             
             dates = GetDates();
 
             Console.WriteLine("\n");
-            C.WriteYellow($"{DateTime.Today.DayOfWeek} {DateTime.Now}");
+            C.WriteYellow($"1 {DateTime.Today.DayOfWeek} {DateTime.Now}");
             C.WriteYellow("----------------------------------------------------------");
             
-            // print past
-            reminders = await GetList(dates[0], "past");
-            if (reminders.Count != 0) {
-                int j = 1;
-                C.WriteBlue("0 Past");
-                for (int i = 0; i < reminders.Count; i++) {
-                    CheckColor(reminders[i], j, dates[0]);
-                    j++;
-                }
-                
-                Console.Write("\n");
-            }
-
-
             // print categories
             for (int i = 0; i < dates.Count; i++) {
-                if (beginning.AddDays(i) == DateTime.Today) {
-                    C.WriteYellow($"{categories[i]} {beginning.AddDays(i).Month}/{beginning.AddDays(i).Day}");
+                int k = 1;
+                if (today.AddDays(i) == DateTime.Today) {
+                    // print past
+                    List<Reminder> past_reminders = await GetList(today, "past");
+                    if (past_reminders.Count != 0) {
+                        for (int j = 0; j < past_reminders.Count; j++) {
+                            if (past_reminders[j].Completed == true) {
+                                Helper.DeleteFromDB(past_reminders[j].Id);
+                                continue;
+                            }
+                            CheckColor(past_reminders[j], k, past_reminders[j].Date);
+                            k++;
+                        }
+                    }
                 } else {
-                    C.WriteBlue($"{categories[i]} {beginning.AddDays(i).Month}/{beginning.AddDays(i).Day}");
+                    C.WriteBlue($"{i+1} {today.AddDays(i).DayOfWeek} {today.AddDays(i).Month}/{today.AddDays(i).Day}");
                 }
                 
                 reminders = await GetList(dates[i], "");
-                PrintReminders(dates[i], reminders);
+                PrintReminders(dates[i], k, reminders);
             }
             
             // print future
@@ -71,9 +59,9 @@ namespace view {
             List<DateTime> dates = new List<DateTime>();
             DateTime date;
             
-            DateTime beginning = DateTime.Today.AddDays(-1*(int)DateTime.Today.DayOfWeek);
+            DateTime today = DateTime.Today;
             for (int i = 0; i < 7; i++) {
-                date = beginning.AddDays(i);
+                date = today.AddDays(i);
                 dates.Add(date);
             }
             
@@ -89,11 +77,11 @@ namespace view {
                 using (var cmd = new NpgsqlCommand()) {
                     cmd.Connection = con;
                     if (s == "past") 
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date < @date AND completed = false";
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date < @date";
                     else if (s == "future")
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date > @date AND completed = false";
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date > @date";
                     else
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date = @date AND completed = false";
+                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date = @date";
                     
                     cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
                     cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
@@ -105,38 +93,9 @@ namespace view {
                                 reader.GetString(reader.GetOrdinal("title")),
                                 reader.GetDateTime(reader.GetOrdinal("date")),
                                 reader.GetBoolean(reader.GetOrdinal("completed")),
-                                reader.GetInt32(reader.GetOrdinal("work_on"))
-                            );
-
-                            reminders.Add(r);
-                        }
-                    }
-                }
-
-                using (var cmd = new NpgsqlCommand()) {
-                    cmd.Connection = con;
-                    if (s == "past") 
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date <= @date AND completed = true";
-                    else if (s == "future")
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date >= @date AND completed = true";
-                    else
-                        cmd.CommandText = $"SELECT * FROM reminders WHERE user_id = @user_id AND date = @date AND completed = true";
-                    cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
-                    cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
-                    
-                    using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync()) {
-                        while (await reader.ReadAsync()) {
-                            if (s == "past") {
-                                Helper.DeleteFromDB((int)reader[0]);
-                                continue;
-                            }
-                            
-                            var r = new Reminder(
-                                reader.GetInt32(reader.GetOrdinal("id")),
-                                reader.GetString(reader.GetOrdinal("title")),
-                                reader.GetDateTime(reader.GetOrdinal("date")),
-                                reader.GetBoolean(reader.GetOrdinal("completed")),
-                                reader.GetInt32(reader.GetOrdinal("work_on"))
+                                reader.GetInt32(reader.GetOrdinal("work_on_count")),
+                                reader.GetBoolean(reader.GetOrdinal("work_on")),
+                                reader.GetInt32(reader.GetOrdinal("work_on_reminder"))
                             );
 
                             reminders.Add(r);
@@ -151,26 +110,33 @@ namespace view {
         private static void CheckColor(Reminder r, int j, DateTime dt) {
             string completed = "[ ]";
             const string format = "{0} {1,-32} {2} {3, 6}";
+            string title = r.Title;
 
-                    if (r.Completed == true) {
-                        completed = "[X]";
-                        
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.WriteLine(format, j, r.Title, r.Date.ToString("d"), completed);
-                        Console.ResetColor();
-                    } else if (DateTime.Compare(DateTime.Today, dt) > 0) {
-                        // overdue
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(format, j, r.Title, r.Date.ToString("d"), completed);
-                        Console.ResetColor();
+            if (r.Work_on) {
+                title = $"WORK ON: {r.Title}";
+            } else if (r.Work_on_count != 0) {
+                title = $"{r.Title} ({r.Work_on_count} subtasks)";
+            }
 
-                    } else {
-                        Console.ResetColor();
-                        Console.WriteLine(format, j, r.Title, r.Date.ToString("d"), completed);
-                    }
+            if (r.Completed == true) {
+                completed = "[X]";
+                
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(format, j, title, r.Date.ToString("d"), completed);
+                Console.ResetColor();
+            } else if (DateTime.Compare(DateTime.Today, dt) > 0) {
+                // overdue
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(format, j, title, r.Date.ToString("d"), completed);
+                Console.ResetColor();
+
+            } else {
+                Console.ResetColor();
+                Console.WriteLine(format, j, title, r.Date.ToString("d"), completed);
+            }
         }
 
-        private static void PrintReminders(DateTime dt, List<Reminder> reminders) {
+        private static void PrintReminders(DateTime dt, int x, List<Reminder> reminders) {
             if (reminders.Count == 0) {
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 if (dt == DateTime.Today) {
@@ -181,7 +147,9 @@ namespace view {
                 Console.ResetColor();
                 
             } else {
-                int j = 1;
+                int j = x;
+                reminders.Sort(Reminder.CompareDates);
+                reminders = reminders.OrderBy(x => x.Completed).ToList();
                 
                 for (int i = 0; i < reminders.Count; i++) { 
                     CheckColor(reminders[i], j, reminders[i].Date);
