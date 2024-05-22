@@ -35,7 +35,10 @@ namespace commands {
 
     public static class Commands {
         public static void Init() {
-            
+            // string path = Environment.GetFolderPath(Environment.);
+            using (StreamWriter outputFile = new StreamWriter("./.env.local")) {
+                outputFile.WriteLine("test");
+            }
         }
 
         public static async Task Add(String[] args) {
@@ -191,39 +194,6 @@ namespace commands {
             } catch (Exception e) {
                 C.Error(e.Message);
             }
-                
-                
-                
-                
-                
-                
-                
-            //     var con = new NpgsqlConnection(
-            //     connectionString: Program.ConnectionString);
-            //     con.Open();
-            //     using var cmd = new NpgsqlCommand();
-            //     cmd.Connection = con;
-
-            //     // Insert data
-            //     cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
-            //     cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
-            //     cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
-            //     cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
-            //     await cmd.ExecuteNonQueryAsync();
-
-            //     con.Close();
-
-            //     string day = "";
-            //     if (DateTime.Compare(DateTime.Today, dt) == 0) {
-            //         day = "today";
-            //     } else {
-            //         day = dt.DayOfWeek.ToString();
-            //     }
-                
-            //     C.Success($"Successfully added \"{title.Trim()}\" to {day}'s list.");
-            // } catch (Exception e) {
-            //     C.Error(e.Message);
-            // }
         }
 
         public static async Task Complete(string arg1, int arg2) {
