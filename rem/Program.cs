@@ -2,6 +2,7 @@
 using helper;
 using view;
 using print;
+using init;
 
 namespace rem {
     public class Program {
@@ -21,7 +22,7 @@ namespace rem {
         public static async Task ControlFlow(string[] args) {
             switch (args[0].ToString()) {
                 case "init":
-                    Commands.Init();
+                    Init.Run();
                     break;
                 case "add":
                     await Commands.Add(args);

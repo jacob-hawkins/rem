@@ -1,27 +1,5 @@
-using rem;
-using Npgsql;
-using print;
-
 namespace helper {
     public static class Helper {    
-        public static async void DeleteFromDB(int reminder_id) {
-            try {
-                var con = new NpgsqlConnection(
-                connectionString: Program.ConnectionString);
-                con.Open();
-                using var cmd = new NpgsqlCommand();
-                cmd.Connection = con;
-
-                cmd.CommandText = $"DELETE FROM reminders WHERE id = @reminder_id";
-                cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
-                await cmd.ExecuteNonQueryAsync();
-
-                con.Close();
-            } catch (Exception e) {
-                C.Error(e.Message);
-            }
-        }
-
         public static void Usage() {
             string logo = @"
  /$$$$$$$  /$$$$$$$$ /$$      /$$
