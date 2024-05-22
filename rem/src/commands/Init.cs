@@ -1,11 +1,8 @@
-using rem;
-using commands;
 using helper;
 using print;
-using Npgsql;
-using System;
 using System.Text;
 using database;
+using types;
 
 namespace init {
     public class Init {
@@ -60,14 +57,15 @@ namespace init {
                 password = ReadPassword();
             }
             
-            bool res = await Database.CheckForUser(username!, password);
-            if (res == false) {
-                C.Error("No user could be found. Check username and password.");
+            Either<User, string> user = await Database.GetUser(username!, password);
+            
+            if (user.IsSuccess == false) {
+                C.Error("No user could not be found. Check username and password.");
                 return;
             }
 
             C.Success("Account found!");
-            res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
+            bool res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
 
 
             AddToENV(lines);
