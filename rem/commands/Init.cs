@@ -67,6 +67,8 @@ namespace init {
             }
 
             C.Success("Account found!");
+            res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
+
 
             AddToENV(lines);
         }
@@ -80,7 +82,6 @@ namespace init {
 
         public static void Run() {
             bool res = Helper.BinaryResQuestion("Do you already have an account?");
-            Console.WriteLine(res);
 
             if (res == true) {
                 Login();

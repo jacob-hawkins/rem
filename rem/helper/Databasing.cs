@@ -4,6 +4,12 @@ using print;
 
 namespace database {
     public static class Database {
+        public static async Task FindUser(int id) {
+
+        }
+
+        public static async Task FindUser(string username, string password) {}
+
         public static async Task<bool> CheckForUser(string username, string password) {
             try {
                 var con = new NpgsqlConnection(
