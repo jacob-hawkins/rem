@@ -1,14 +1,80 @@
 using Npgsql;
 using rem;
 using print;
+using types;
 
 namespace database {
     public static class Database {
-        public static async Task FindUser(int id) {
+        public static async Task<Either<User, string>> FindUser(int id) {
+            User u;
+            
+            try {
+                var con = new NpgsqlConnection(
+                connectionString: Program.ConnectionString);
+                con.Open();
+                using var cmd = new NpgsqlCommand();
+                cmd.Connection = con;
 
+                cmd.CommandText = $"SELECT * FROM users WHERE id = @id";
+                cmd.Parameters.Add("@id", NpgsqlTypes.NpgsqlDbType.Integer).Value = id;
+            
+                using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync()) {
+                    u = new User(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("username")),
+                        reader.GetString(reader.GetOrdinal("password")),
+                        reader.GetString(reader.GetOrdinal("email")),
+                        reader.GetInt32(reader.GetOrdinal("completed_reminders")),
+                        reader.GetInt32(reader.GetOrdinal("total_reminders")),
+                        reader.GetBoolean(reader.GetOrdinal("admin")),
+                        reader.GetString(reader.GetOrdinal("notion_key"))
+                    );
+                }
+
+                con.Close();
+                return new Either<User, string>(u);
+
+            } catch (Exception e) {
+                C.Error(e.Message);
+                return new Either<User, string>("User could not be found.");
+            }
         }
 
-        public static async Task FindUser(string username, string password) {}
+        public static async Task<Either<User, string>> FindUser(string username, string password) {
+            User u;
+            
+            try {
+                var con = new NpgsqlConnection(
+                connectionString: Program.ConnectionString);
+                con.Open();
+                using var cmd = new NpgsqlCommand();
+                cmd.Connection = con;
+
+                cmd.CommandText = $"SELECT * FROM users WHERE username = @username AND password = @password";
+                cmd.Parameters.Add("@username", NpgsqlTypes.NpgsqlDbType.Text).Value = username;
+                cmd.Parameters.Add("@password", NpgsqlTypes.NpgsqlDbType.Text).Value = password;
+            
+                using (NpgsqlDataReader reader = await cmd.ExecuteReaderAsync()) {
+                    u = new User(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("username")),
+                        reader.GetString(reader.GetOrdinal("password")),
+                        reader.GetString(reader.GetOrdinal("email")),
+                        reader.GetInt32(reader.GetOrdinal("completed_reminders")),
+                        reader.GetInt32(reader.GetOrdinal("total_reminders")),
+                        reader.GetBoolean(reader.GetOrdinal("admin")),
+                        reader.GetString(reader.GetOrdinal("notion_key"))
+                    );
+                }
+
+                con.Close();
+                return new Either<User, string>(u);
+
+            } catch (Exception e) {
+                C.Error(e.Message);
+                return new Either<User, string>("User could not be found.");
+            }
+        }
 
         public static async Task<bool> CheckForUser(string username, string password) {
             try {
