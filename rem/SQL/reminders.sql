@@ -1,6 +1,3 @@
--- DELETE FROM reminders WHERE title = 'test ';
-
--- DROP TABLE users;
 -- DROP TABLE work_on;
 DROP TABLE reminders;
 
@@ -33,6 +30,5 @@ UPDATE reminders SET work_on_count=work_on_count+1 WHERE id = 2;
 INSERT INTO reminders (user_id, title, date, work_on, work_on_reminder) VALUES (1, 'WORK ON TEST 2', '5/18/24', True, 1);
 UPDATE reminders SET work_on_count=work_on_count+1 WHERE id = 2;
 
--- SELECT * FROM users;
 SELECT * FROM reminders;
 -- SELECT * FROM work_on;

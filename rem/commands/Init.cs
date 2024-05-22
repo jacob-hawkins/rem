@@ -5,6 +5,7 @@ using print;
 using Npgsql;
 using System;
 using System.Text;
+using database;
 
 namespace init {
     public class Init {
@@ -40,7 +41,7 @@ namespace init {
             return passwordBuilder.ToString();
         }
         
-        private static void Login() {
+        private static async void Login() {
             List<string> lines = new List<string> {};
 
             string? username = null;
@@ -61,6 +62,13 @@ namespace init {
 
             Console.WriteLine(username);
             Console.WriteLine(password);
+            
+            bool res = await Database.CheckForUser(username, password);
+
+            if (res == false) {
+                C.Error("No user could be found. Check username and password.");
+                return;
+            }
 
             AddToENV(lines);
         }
