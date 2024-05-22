@@ -8,14 +8,18 @@ namespace commands {
         public string Title { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public bool Completed { get; set; }
-        public int Work_on { get; set; }
+        public int Work_on_count { get; set; }
+        public bool Work_on { get; set; }
+        public int Work_on_reminder { get; set; }
 
-        public Reminder (int id, string title, DateTime date, bool completed, int work_on) {
+        public Reminder (int id, string title, DateTime date, bool completed, int work_on_count, bool work_on, int work_on_reminder) {
             Id = id;
             Title = title;
             Date = date;
             Completed = completed;
+            Work_on_count = work_on_count;
             Work_on = work_on;
+            Work_on_reminder = work_on_reminder;
         }
 
         // Sort by date
@@ -282,7 +286,9 @@ namespace commands {
                             (string)reader[2] ?? string.Empty,
                             (DateTime)reader[3],
                             (bool)reader[4],
-                            (int)reader[5]
+                            (int)reader[5],
+                            (bool)reader[6],
+                            (int)reader[7]
                         );
 
                         reminders.Add(r);
