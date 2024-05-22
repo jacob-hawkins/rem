@@ -35,9 +35,33 @@ namespace commands {
 
     public static class Commands {
         public static void Init() {
-            // string path = Environment.GetFolderPath(Environment.);
+            List<string> lines = new List<string> {};
+            string? res = null;
+            
+            while (res == null) {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("Do you already have an account? [Y/N]: ");
+                Console.ResetColor();
+                res = Console.ReadLine();
+            }
+
+            C.WriteBlue(res);
+            C.WriteBlue(res.ToUpper());
+            
+            if (res.ToUpper() == "Y") {
+                // login
+                lines.Add("login");
+            } else if (res.ToUpper() == "N") {
+                // sign up
+                lines.Add("Sign up");
+            } else {
+                C.Error("Invalid Character Entered");
+                return;
+            }
+
             using (StreamWriter outputFile = new StreamWriter("./.env.local")) {
-                outputFile.WriteLine("test");
+                foreach (string line in lines)
+                outputFile.WriteLine(line);
             }
         }
 
@@ -52,7 +76,7 @@ namespace commands {
             
             if (args.Length == 1) {
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write("Remeber: ");
+                Console.Write("Remember: ");
                 Console.ResetColor();
                 
                 reminder = Console.ReadLine();
@@ -62,7 +86,7 @@ namespace commands {
                     flag = true;
 
                     Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write("Remeber: ");
+                    Console.Write("Remember: ");
                     Console.ResetColor();
                 
                     reminder = Console.ReadLine();
