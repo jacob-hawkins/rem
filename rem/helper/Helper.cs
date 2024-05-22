@@ -1,3 +1,5 @@
+using print;
+
 namespace helper {
     public static class Helper {    
         public static void Usage() {
@@ -47,6 +49,28 @@ namespace helper {
             Console.ResetColor();
 
             Console.WriteLine("Displays all commands and descriptions available.");
+        }
+    
+        public static bool BinaryResQuestion(string question) {
+            question += " [Y/N]: ";
+            string? res = "";
+
+            while (res == "") {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write("Do you already have an account? [Y/N]: ");
+                Console.ResetColor();
+                res = Console.ReadLine();
+            }
+
+            if (String.Equals(res!.ToUpper(), "Y")) {
+                return true;
+            } else if (String.Equals(res!.ToUpper(), "N")) {
+                return false;
+            } else {
+                C.Error("Invalid Character Entered");
+                BinaryResQuestion(question);
+            }
+            return false;
         }
     }
 }

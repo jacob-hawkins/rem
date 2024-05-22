@@ -44,31 +44,29 @@ namespace init {
         private static async void Login() {
             List<string> lines = new List<string> {};
 
-            string? username = null;
-            while (username == null) {
+            string? username = "";
+            while (username == "") {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write("Username: ");
                 Console.ResetColor();
                 username = Console.ReadLine();
             }
             
-            string? password = null;
-            while (password == null) {
+            string? password = "";
+            while (password == "") {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write("Password: ");
                 Console.ResetColor();
                 password = ReadPassword();
             }
-
-            Console.WriteLine(username);
-            Console.WriteLine(password);
             
-            bool res = await Database.CheckForUser(username, password);
-
+            bool res = await Database.CheckForUser(username!, password);
             if (res == false) {
                 C.Error("No user could be found. Check username and password.");
                 return;
             }
+
+            C.Success("Account found!");
 
             AddToENV(lines);
         }
@@ -81,22 +79,14 @@ namespace init {
         }
 
         public static void Run() {
-            string? res = null;
-            
-            while (res == null) {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write("Do you already have an account? [Y/N]: ");
-                Console.ResetColor();
-                res = Console.ReadLine();
-            }
-            
-            if (String.Equals(res.ToUpper(), "Y")) {
+            bool res = Helper.BinaryResQuestion("Do you already have an account?");
+            Console.WriteLine(res);
+
+            if (res == true) {
                 Login();
-            } else if (String.Equals(res.ToUpper(), "N")) {
+            } else if (res == false) {
                 SignUp();
-            } else {
-                C.Error("Invalid Character Entered");
-                return;
             }
         }
-    }}
+    }
+}
