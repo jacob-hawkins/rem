@@ -57,7 +57,7 @@ namespace helper {
 
             while (res == "") {
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write("Do you already have an account? [Y/N]: ");
+                Console.Write(question);
                 Console.ResetColor();
                 res = Console.ReadLine();
             }

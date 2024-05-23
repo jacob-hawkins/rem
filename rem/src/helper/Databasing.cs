@@ -70,7 +70,6 @@ namespace database {
                 }
 
                 con.Close();
-                Console.WriteLine("Success");
                 return new Either<User, string>(u!);
 
             } catch {

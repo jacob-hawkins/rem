@@ -6,9 +6,9 @@ using types;
 
 namespace init {
     public class Init {
-        private static void AddToENV(List<string> lines) {
-            using (StreamWriter outputFile = new StreamWriter("./.env.local")) {
-                foreach (string line in lines)
+        private const string env_path = "./.env.local";
+        private static void AddToENV(string line) {
+            using (StreamWriter outputFile = new StreamWriter(env_path, true)) {
                 outputFile.WriteLine(line);
             }
         }
@@ -38,9 +38,10 @@ namespace init {
             return passwordBuilder.ToString();
         }
         
+        private static void SetUpNotion() {
+            return;
+        }
         private static async void Login() {
-            List<string> lines = new List<string> {};
-
             string? username = "";
             while (username == "") {
                 Console.ForegroundColor = ConsoleColor.Blue;
@@ -64,26 +65,47 @@ namespace init {
                 return;
             }
 
+            User u = user.Value!;
+            
+            AddToENV($"USER_ID = {u.Id}");
+            AddToENV($"USER_NAME = {u.Username}");
+            
+            Console.WriteLine();
             C.Success("Account found!");
-            bool res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
+            Console.WriteLine();
+            
+            if (u.Notion_key == "-1") {
+                // set up notion?
+                bool res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
 
-
-            AddToENV(lines);
+                if (res == true) {
+                    C.WriteBlue("Great! I will walk you through step by step...");
+                    SetUpNotion();
+                }
+            }
         }
 
         private static void SignUp() {
-            List<string> lines = new List<string> {};
-            lines.Add("Sign up");
-
-            AddToENV(lines);
+            AddToENV("Sign up");
         }
 
         public static void Run() {
-            bool res = Helper.BinaryResQuestion("Do you already have an account?");
+            bool res = Helper.BinaryResQuestion("Running this will clear any previous setup. Do you want to continue?");
+            if (!res) {
+                return;
+            }
+            
+            // clear env file
+            using (StreamWriter outputFile = new StreamWriter(env_path)) {
+                outputFile.WriteLine();
+            }
+           
+            res = Helper.BinaryResQuestion("Do you already have an account?");
+            Console.WriteLine();
 
-            if (res == true) {
+            if (res) {
                 Login();
-            } else if (res == false) {
+            } else {
                 SignUp();
             }
         }
