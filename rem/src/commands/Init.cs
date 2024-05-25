@@ -78,10 +78,13 @@ namespace init {
                 // set up notion?
                 bool res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
 
-                if (res == true) {
+                if (res) {
                     C.WriteBlue("Great! I will walk you through step by step...");
                     SetUpNotion();
                 }
+
+                Console.WriteLine();
+                C.Success("You are all set!");
             }
         }
 
@@ -97,7 +100,7 @@ namespace init {
             
             // clear env file
             using (StreamWriter outputFile = new StreamWriter(env_path)) {
-                outputFile.WriteLine();
+                outputFile.Write("");
             }
            
             res = Helper.BinaryResQuestion("Do you already have an account?");
