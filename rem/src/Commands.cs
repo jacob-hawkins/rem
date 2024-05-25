@@ -1,43 +1,10 @@
 using rem;
 using print;
 using Npgsql;
+using types;
 
 namespace commands {
-    public class Reminder {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
-        public bool Completed { get; set; }
-        public int Work_on_count { get; set; }
-        public bool Work_on { get; set; }
-        public int Work_on_reminder { get; set; }
-
-        public Reminder (int id, string title, DateTime date, bool completed, int work_on_count, bool work_on, int work_on_reminder) {
-            Id = id;
-            Title = title;
-            Date = date;
-            Completed = completed;
-            Work_on_count = work_on_count;
-            Work_on = work_on;
-            Work_on_reminder = work_on_reminder;
-        }
-
-        // Sort by date
-        public static int CompareDates(Reminder x, Reminder y) {
-            return DateTime.Compare(x.Date, y.Date);
-        }
-
-        // Sort false then true
-        public static int CompareCompleted(Reminder x, Reminder y) {
-            return x.Completed.CompareTo(y.Completed);
-        }
-    }
-
     public static class Commands {
-        public static void Init() {
-            
-        }
-
         public static async Task Add(String[] args) {
             DateTime dt;
             string title;
@@ -49,7 +16,7 @@ namespace commands {
             
             if (args.Length == 1) {
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write("Remeber: ");
+                Console.Write("Remember: ");
                 Console.ResetColor();
                 
                 reminder = Console.ReadLine();
@@ -59,7 +26,7 @@ namespace commands {
                     flag = true;
 
                     Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write("Remeber: ");
+                    Console.Write("Remember: ");
                     Console.ResetColor();
                 
                     reminder = Console.ReadLine();
@@ -191,39 +158,6 @@ namespace commands {
             } catch (Exception e) {
                 C.Error(e.Message);
             }
-                
-                
-                
-                
-                
-                
-                
-            //     var con = new NpgsqlConnection(
-            //     connectionString: Program.ConnectionString);
-            //     con.Open();
-            //     using var cmd = new NpgsqlCommand();
-            //     cmd.Connection = con;
-
-            //     // Insert data
-            //     cmd.CommandText = $"INSERT INTO reminders (user_id, title, date) VALUES (@user_id, @title, @date)";
-            //     cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
-            //     cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = title;
-            //     cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = dt;
-            //     await cmd.ExecuteNonQueryAsync();
-
-            //     con.Close();
-
-            //     string day = "";
-            //     if (DateTime.Compare(DateTime.Today, dt) == 0) {
-            //         day = "today";
-            //     } else {
-            //         day = dt.DayOfWeek.ToString();
-            //     }
-                
-            //     C.Success($"Successfully added \"{title.Trim()}\" to {day}'s list.");
-            // } catch (Exception e) {
-            //     C.Error(e.Message);
-            // }
         }
 
         public static async Task Complete(string arg1, int arg2) {

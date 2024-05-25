@@ -1,10 +1,9 @@
 using rem;
-using commands;
-using helper;
 using print;
 using Npgsql;
+using database;
 
-namespace view {
+namespace commands {
     public class View {
         public static async Task SeeReminders() {
             List<Reminder> reminders;
@@ -26,7 +25,7 @@ namespace view {
                     if (past_reminders.Count != 0) {
                         for (int j = 0; j < past_reminders.Count; j++) {
                             if (past_reminders[j].Completed == true) {
-                                Helper.DeleteFromDB(past_reminders[j].Id);
+                                Database.Delete(past_reminders[j].Id);
                                 continue;
                             }
                             CheckColor(past_reminders[j], k, past_reminders[j].Date);
