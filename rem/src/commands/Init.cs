@@ -4,7 +4,7 @@ using System.Text;
 using database;
 using types;
 
-namespace init {
+namespace commands {
     public class Init {
         private const string env_path = "./.env.local";
         private static void AddToENV(string line) {

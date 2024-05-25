@@ -1,8 +1,6 @@
 ﻿using commands;
 using helper;
-using view;
 using print;
-using init;
 
 namespace rem {
     public class Program {

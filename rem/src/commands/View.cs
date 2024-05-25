@@ -1,10 +1,9 @@
 using rem;
-using commands;
 using print;
 using Npgsql;
 using database;
 
-namespace view {
+namespace commands {
     public class View {
         public static async Task SeeReminders() {
             List<Reminder> reminders;
