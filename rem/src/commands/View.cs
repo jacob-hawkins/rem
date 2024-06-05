@@ -2,6 +2,7 @@ using rem;
 using print;
 using Npgsql;
 using database;
+using types;
 
 namespace commands {
     public class View {

@@ -56,7 +56,6 @@ namespace commands {
                     return;
                 }
             } else {
-                
                 C.WriteBlue("When: ");
                 string? date = Console.ReadLine();
                 if (date == "") {
@@ -76,21 +75,25 @@ namespace commands {
             }
 
             if (flag == 'w') {
-                dates = WorkOn();
+                dates = WorkOnDates();
                 if (dates.Count == 0) return;
             }
 
-            Reminder reminder = new Reminder(0, title, dt, false, dates.Count, false, 0);
+            Reminder reminder = new Reminder(0, title, dt, false, dates.Count, false, -1);
             reminder_id = await Database.AddReminder(reminder);
             
+            int count = 0;
             for (int i = 0; i < dates.Count; i++) {
                 Reminder work_on = new Reminder(0, title, dates[i], false, 0, true, reminder_id);
                 work_on_reminder_id = await Database.AddReminder(work_on);
 
                 if (work_on_reminder_id == -1) {
-                    C.Error($"Error adding \"{title}\"");
+                    C.Error($"There was a problem adding \"{title}\"");
+                } else {
+                    count++;
                 }
             }
+            await Database.UpdateWorkOnCount(reminder_id, count);
         }
         
         private static DateTime FindDate(string d) {
@@ -120,7 +123,7 @@ namespace commands {
             return DateTime.MinValue;
         }
 
-        private static List<DateTime> WorkOn() {
+        private static List<DateTime> WorkOnDates() {
             List<DateTime> dates = [];
             string? res;
             

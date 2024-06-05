@@ -89,13 +89,15 @@ namespace database {
                         cmd.Connection = con;
 
                         // Insert data
-                        cmd.CommandText = $"INSERT INTO reminders (user_id, title, date, work_on_id) VALUES (@user_id, @title, @date) RETURNING id";
+                        cmd.CommandText = $"INSERT INTO reminders (user_id, title, date, work_on, work_on_reminder) VALUES (@user_id, @title, @date, @work_on, @work_on_reminder) RETURNING id";
                         cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
                         cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = reminder.Title.Trim();
                         cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = reminder.Date;
+                        cmd.Parameters.Add("@work_on", NpgsqlTypes.NpgsqlDbType.Boolean).Value = reminder.Work_on;
+                        cmd.Parameters.Add("@work_on_reminder", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder.Work_on_reminder;
                         
                         var result = await cmd.ExecuteScalarAsync();
-                        if (result != null) id = (int)result;
+                        if (result != null) id = Convert.ToInt32(result);
                     }                    
                 }
 
@@ -116,6 +118,30 @@ namespace database {
             }
 
             return id;
+        }
+
+        public static async Task<bool> UpdateWorkOnCount(int reminder_id, int num) {            
+            try {
+                await using (var con = new NpgsqlConnection(connectionString: Program.ConnectionString)) {
+                    con.Open();
+
+                    // add to reminders table
+                    await using (var cmd = new NpgsqlCommand()) {
+                        cmd.Connection = con;
+
+                        // Insert data
+                        cmd.CommandText = $"UPDATE reminders SET work_on_count=work_on_count+@num WHERE id = @reminder_id";
+                        cmd.Parameters.Add("@num", NpgsqlTypes.NpgsqlDbType.Integer).Value = num;
+                        cmd.Parameters.Add("@reminder_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = reminder_id;
+                        await cmd.ExecuteNonQueryAsync();
+                    }                    
+                }
+            } catch (Exception e) {
+                C.Error(e.Message);
+                return false;
+            }
+
+            return true;
         }
 
         public static async void Delete(int reminder_id) {
