@@ -76,7 +76,48 @@ namespace database {
                 return new Either<User, string>("User could not be found.");
             }
         }
-        
+
+        public static async Task<int> AddReminder(Reminder reminder) {
+            int id = -1;
+            
+            try {
+                await using (var con = new NpgsqlConnection(connectionString: Program.ConnectionString)) {
+                    con.Open();
+
+                    // add to reminders table
+                    await using (var cmd = new NpgsqlCommand()) {
+                        cmd.Connection = con;
+
+                        // Insert data
+                        cmd.CommandText = $"INSERT INTO reminders (user_id, title, date, work_on_id) VALUES (@user_id, @title, @date) RETURNING id";
+                        cmd.Parameters.Add("@user_id", NpgsqlTypes.NpgsqlDbType.Integer).Value = Program.user_id;
+                        cmd.Parameters.Add("@title", NpgsqlTypes.NpgsqlDbType.Varchar).Value = reminder.Title.Trim();
+                        cmd.Parameters.Add("@date", NpgsqlTypes.NpgsqlDbType.Date).Value = reminder.Date;
+                        
+                        var result = await cmd.ExecuteScalarAsync();
+                        if (result != null) id = (int)result;
+                    }                    
+                }
+
+                // check if adding to past list
+                if (DateTime.Compare(DateTime.Today, reminder.Date) > 0) C.Success($"Successfully added \"{reminder.Title.Trim()}\".");
+                else {
+                    string day = "";
+                    if (DateTime.Compare(DateTime.Today, reminder.Date) == 0) {
+                        day = "today";
+                    } else {
+                        day = reminder.Date.DayOfWeek.ToString();
+                    }
+
+                    C.Success($"Successfully added \"{reminder.Title.Trim()}\" to {day}'s list.");
+                }
+            } catch (Exception e) {
+                C.Error(e.Message);
+            }
+
+            return id;
+        }
+
         public static async void Delete(int reminder_id) {
             try {
                 var con = new NpgsqlConnection(

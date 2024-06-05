@@ -13,8 +13,8 @@ namespace commands {
             dates = GetDates();
 
             Console.WriteLine("\n");
-            C.WriteYellow($"1 {DateTime.Today.DayOfWeek} {DateTime.Now}");
-            C.WriteYellow("----------------------------------------------------------");
+            C.WriteYellowLine($"1 {DateTime.Today.DayOfWeek} {DateTime.Now}");
+            C.WriteYellowLine("----------------------------------------------------------");
             
             // print categories
             for (int i = 0; i < dates.Count; i++) {
@@ -33,7 +33,7 @@ namespace commands {
                         }
                     }
                 } else {
-                    C.WriteBlue($"{i+1} {today.AddDays(i).DayOfWeek} {today.AddDays(i).Month}/{today.AddDays(i).Day}");
+                    C.WriteBlueLine($"{i+1} {today.AddDays(i).DayOfWeek} {today.AddDays(i).Month}/{today.AddDays(i).Day}");
                 }
                 
                 reminders = await GetList(dates[i], "");
@@ -44,7 +44,7 @@ namespace commands {
             reminders = await GetList(dates[dates.Count-1], "future");
             if (reminders.Count != 0) {
                 int j = 1;
-                C.WriteBlue("8 Future");
+                C.WriteBlueLine("8 Future");
                 for (int i = 0; i < reminders.Count; i++) {
                     CheckColor(reminders[i], j, dates[dates.Count-1]);
                     j++;

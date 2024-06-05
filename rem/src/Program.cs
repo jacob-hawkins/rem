@@ -23,7 +23,7 @@ namespace rem {
                     Init.Run();
                     break;
                 case "add":
-                    await Commands.Add(args);
+                    await Add.Run(args);
                     break;
                 case "complete":
                     if (args.Length < 3) {

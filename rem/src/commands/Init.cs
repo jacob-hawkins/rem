@@ -79,7 +79,7 @@ namespace commands {
                 bool res = Helper.BinaryResQuestion("Do you want to integrate using Notion?");
 
                 if (res) {
-                    C.WriteBlue("Great! I will walk you through step by step...");
+                    C.WriteBlueLine("Great! I will walk you through step by step...");
                     SetUpNotion();
                 }
 

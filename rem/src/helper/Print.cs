@@ -1,20 +1,39 @@
 namespace print {
      public static class C {
+        public static void WriteBlueLine(string s) {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(s);
+            Console.ResetColor();        
+        }
+
         public static void WriteBlue(string s) {
             Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write(s);
+            Console.ResetColor();        
+        }
+
+        public static void WriteGrayLine(string s) {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine(s);
             Console.ResetColor();        
         }
 
         public static void WriteGray(string s) {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine(s);
+            Console.Write(s);
             Console.ResetColor();        
         }
 
-        public static void WriteYellow(string s) {
+        public static void WriteYellowLine(string s) {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(s);
+            Console.ResetColor();    
+        }
+
+
+        public static void WriteYellow(string s) {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write(s);
             Console.ResetColor();    
         }
 
